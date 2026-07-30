@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b5fa5" />
   <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=9" />
+  <link rel="stylesheet" href="style.css?v=10" />
   <title>Transporte HEURO</title>
 </head>
 <body>
@@ -20,49 +20,56 @@
     </section>
 
     <section id="loginScreen" class="screen">
-      <div class="brand-card"><div class="brand-mark">H</div><h1>Transporte HEURO</h1><p>Solicitação, registro e acompanhamento</p></div>
+      <div class="brand-card"><div class="brand-mark">H</div><h1>Transporte HEURO</h1><p>Acesso ao sistema</p></div>
       <form id="loginForm" class="card form-card">
-        <label for="userName">Usuário</label><input id="userName" type="text" value="Tiago" required />
-        <label for="password">Senha</label><input id="password" type="password" value="1234" required />
-        <label for="profile">Perfil</label>
-        <select id="profile"><option value="solicitante">Solicitante</option><option value="transporte">Empresa de transporte</option><option value="administrador">Administrador</option></select>
+        <label for="userName">Nome de usuário</label><input id="userName" type="text" autocomplete="username" required />
+        <label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" required />
         <label class="checkbox-row"><input id="rememberUser" type="checkbox" checked /><span>Lembrar usuário neste aparelho</span></label>
-        <button class="primary-button" type="submit">Entrar</button><p class="demo-note">Primeira etapa — senha provisória: 1234</p>
+        <button class="primary-button" type="submit">Entrar</button>
+        <button id="openRegister" class="link-button" type="button">Realizar primeiro cadastro</button>
+        <p id="loginMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="registerScreen" class="screen">
+      <div class="section-head page-head"><div><span class="eyebrow dark">Primeiro acesso</span><h2>Realizar cadastro</h2><p>Escolha o perfil e preencha seus dados.</p></div><button id="registerBack" class="back-button" type="button">Voltar</button></div>
+      <form id="registerForm" class="card form-card">
+        <fieldset class="profile-options">
+          <legend>Tipo de acesso solicitado</legend>
+          <label class="profile-option"><input type="radio" name="registerProfile" value="solicitante" required /><span><strong>Solicitante de transporte</strong><small>Profissional que realiza pedidos de transporte.</small></span></label>
+          <label class="profile-option"><input type="radio" name="registerProfile" value="transporte" required /><span><strong>Executante de transporte</strong><small>Profissional que recebe e executa os transportes.</small></span></label>
+          <label class="profile-option"><input type="radio" name="registerProfile" value="administrador" required /><span><strong>Administrador</strong><small>Responsável por autorizar usuários e administrar o sistema.</small></span></label>
+        </fieldset>
+        <label for="fullName">Nome completo</label><input id="fullName" type="text" autocomplete="name" required />
+        <label for="cpf">CPF</label><input id="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
+        <label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required />
+        <label for="phone">Telefone/WhatsApp</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" required />
+        <label for="newUserName">Nome de usuário</label><input id="newUserName" type="text" autocomplete="username" minlength="3" required />
+        <label for="newPassword">Senha</label><input id="newPassword" type="password" autocomplete="new-password" minlength="6" required />
+        <label for="confirmPassword">Confirmar senha</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required />
+        <label class="checkbox-row declaration"><input id="truthDeclaration" type="checkbox" required /><span>Declaro que as informações fornecidas são verdadeiras e estou ciente de que o acesso depende da autorização de um administrador.</span></label>
+        <button class="primary-button" type="submit">Enviar cadastro para aprovação</button>
+        <p id="registerMessage" class="form-message" aria-live="polite"></p>
       </form>
     </section>
 
     <section id="homeScreen" class="screen">
       <header class="topbar"><div><span class="eyebrow">Transporte HEURO</span><h2 id="welcomeName">Olá</h2><p id="welcomeRole"></p></div><button id="logoutButton" class="text-button">Sair</button></header>
       <div id="dashboard" class="panel-grid">
-        <button class="feature-card highlight" data-view="request"><span class="feature-icon">＋</span><strong>Nova solicitação</strong><small>Registrar pedido de transporte</small></button>
+        <button id="newRequestCard" class="feature-card highlight" data-view="request"><span class="feature-icon">＋</span><strong>Nova solicitação</strong><small>Registrar pedido de transporte</small></button>
         <button class="feature-card" data-view="list"><span class="feature-icon">▤</span><strong>Solicitações</strong><small>Consultar e concluir pedidos</small></button>
-        <button class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Número do WhatsApp</small></button>
+        <button id="usersCard" class="feature-card hidden" data-view="users"><span class="feature-icon">✓</span><strong>Autorizar usuários</strong><small>Cadastros aguardando análise</small><span id="pendingBadge" class="badge hidden">0</span></button>
+        <button id="settingsCard" class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Número do WhatsApp</small></button>
       </div>
 
       <section id="requestView" class="card content-view hidden">
-        <div class="section-head"><div><span class="eyebrow dark">Etapa 1</span><h3>Nova solicitação</h3></div><button class="back-button" data-back>Voltar</button></div>
+        <div class="section-head"><div><span class="eyebrow dark">Solicitação</span><h3>Nova solicitação</h3></div><button class="back-button" data-back>Voltar</button></div>
         <form id="requestForm" class="request-form">
           <div class="form-grid">
             <label>Nome do paciente<input id="patient" required /></label>
             <label>Data de nascimento<input id="birthDate" type="date" /></label>
-            <label>Setor de origem
-              <select id="originSector" required>
-                <option value="">Selecione o setor</option>
-                <option>Sala Vermelha</option>
-                <option>Clínica Médica</option>
-                <option>Clínica Cirúrgica/Ortopédica</option>
-                <option>Clínica Geral</option>
-                <option>UTI</option>
-                <option>Centro Cirúrgico</option>
-              </select>
-            </label>
-            <div class="location-group">
-              <span class="group-label">Local de origem</span>
-              <div class="location-fields">
-                <label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label>
-                <label>Leito<input id="bed" placeholder="Ex.: 08" /></label>
-              </div>
-            </div>
+            <label>Setor de origem<select id="originSector" required><option value="">Selecione o setor</option><option>Sala Vermelha</option><option>Clínica Médica</option><option>Clínica Cirúrgica/Ortopédica</option><option>Clínica Geral</option><option>UTI</option><option>Centro Cirúrgico</option></select></label>
+            <div class="location-group"><span class="group-label">Local de origem</span><div class="location-fields"><label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label><label>Leito<input id="bed" placeholder="Ex.: 08" /></label></div></div>
             <label>Unidade de destino<input id="destination" required /></label>
             <label>Data do transporte<input id="transportDate" type="date" required /></label>
             <label>Horário previsto<input id="transportTime" type="time" required /></label>
@@ -73,24 +80,20 @@
           </div>
           <label>Contato do setor solicitante<input id="contact" inputmode="tel" /></label>
           <label>Observações<textarea id="notes" rows="4"></textarea></label>
-          <label>Documento da regulação<input id="attachment" type="file" accept=".pdf,image/*" /><small class="help">Nesta etapa, o nome do documento fica registrado. O arquivo ainda não é enviado para a nuvem.</small></label>
+          <label>Documento da regulação<input id="attachment" type="file" accept=".pdf,image/*" /><small class="help">Nesta etapa, apenas o nome do documento fica registrado neste aparelho.</small></label>
           <div class="action-row"><button class="primary-button" type="submit">Salvar solicitação</button></div>
         </form>
       </section>
 
-      <section id="listView" class="content-view hidden">
-        <div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div>
-        <div id="requestList" class="request-list"></div>
-      </section>
+      <section id="listView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div><div id="requestList" class="request-list"></div></section>
 
-      <section id="settingsView" class="card content-view hidden">
-        <div class="section-head"><div><span class="eyebrow dark">Configuração</span><h3>WhatsApp do transporte</h3></div><button class="back-button" data-back>Voltar</button></div>
-        <form id="settingsForm" class="request-form"><label>Número com DDD<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" /></label><p class="help">Informe somente números. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar número</button></form>
-      </section>
+      <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
+
+      <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração</span><h3>WhatsApp do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>Número com DDD<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" /></label><p class="help">Informe somente números. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar número</button></form></section>
 
       <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
     </section>
   </main>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
