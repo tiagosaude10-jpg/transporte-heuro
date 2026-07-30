@@ -1,0 +1,11 @@
+{
+  "name": "Transporte HEURO",
+  "short_name": "HEURO Transporte",
+  "description": "Aplicativo de agendamento de transporte do HEURO",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fa",
+  "theme_color": "#0b5fa5",
+  "lang": "pt-BR",
+  "orientation": "portrait-primary"
+}
