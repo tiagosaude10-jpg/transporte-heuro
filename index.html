@@ -37,7 +37,24 @@
           <div class="form-grid">
             <label>Nome do paciente<input id="patient" required /></label>
             <label>Data de nascimento<input id="birthDate" type="date" /></label>
-            <label>Unidade de origem<input id="origin" value="HEURO" required /></label>
+            <label>Setor de origem
+              <select id="originSector" required>
+                <option value="">Selecione o setor</option>
+                <option>Sala Vermelha</option>
+                <option>Clínica Médica</option>
+                <option>Clínica Cirúrgica Geral</option>
+                <option>Clínica Geral</option>
+                <option>UTI</option>
+                <option>Centro Cirúrgico</option>
+              </select>
+            </label>
+            <div class="location-group">
+              <span class="group-label">Local de origem</span>
+              <div class="location-fields">
+                <label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label>
+                <label>Leito<input id="bed" placeholder="Ex.: 08" /></label>
+              </div>
+            </div>
             <label>Unidade de destino<input id="destination" required /></label>
             <label>Data do transporte<input id="transportDate" type="date" required /></label>
             <label>Horário previsto<input id="transportTime" type="time" required /></label>
