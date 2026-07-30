@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b5fa5" />
+  <meta name="description" content="Aplicativo de agendamento de transporte do HEURO" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Transporte HEURO</title>
+</head>
+<body>
+  <main id="app">
+    <section id="loginScreen" class="screen active">
+      <div class="brand-card">
+        <div class="brand-mark">H</div>
+        <h1>Transporte HEURO</h1>
+        <p>Agendamento rápido e objetivo</p>
+      </div>
+
+      <form id="loginForm" class="card form-card">
+        <label for="userName">Usuário</label>
+        <input id="userName" name="userName" type="text" value="Tiago" autocomplete="username" required />
+
+        <label for="password">Senha</label>
+        <input id="password" name="password" type="password" value="1234" autocomplete="current-password" required />
+
+        <label for="profile">Perfil de demonstração</label>
+        <select id="profile" name="profile">
+          <option value="solicitante">Solicitante</option>
+          <option value="transporte">Transporte</option>
+          <option value="administrador">Administrador</option>
+        </select>
+
+        <label class="checkbox-row">
+          <input id="rememberUser" type="checkbox" checked />
+          <span>Lembrar usuário neste aparelho</span>
+        </label>
+
+        <button class="primary-button" type="submit">Entrar</button>
+        <p class="demo-note">Versão de demonstração — senha: 1234</p>
+      </form>
+    </section>
+
+    <section id="homeScreen" class="screen">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">Transporte HEURO</span>
+          <h2 id="welcomeName">Olá, Tiago</h2>
+          <p id="welcomeRole">Enfermeiro</p>
+        </div>
+        <button id="logoutButton" class="text-button" type="button">Sair</button>
+      </header>
+
+      <div id="solicitantePanel" class="panel-grid">
+        <button class="feature-card highlight" data-action="new-request">
+          <span class="feature-icon">＋</span>
+          <strong>Nova solicitação</strong>
+          <small>Agendar transporte</small>
+        </button>
+        <button class="feature-card" data-action="my-requests">
+          <span class="feature-icon">▤</span>
+          <strong>Minhas solicitações</strong>
+          <small>Acompanhar pedidos</small>
+        </button>
+        <button class="feature-card" data-action="today">
+          <span class="feature-icon">◷</span>
+          <strong>Transportes de hoje</strong>
+          <small>Agenda do dia</small>
+        </button>
+        <button class="feature-card" data-action="notifications">
+          <span class="feature-icon">●</span>
+          <strong>Notificações</strong>
+          <small>Atualizações recentes</small>
+        </button>
+      </div>
+
+      <div id="transportePanel" class="panel-grid hidden">
+        <button class="feature-card highlight"><span class="feature-icon">3</span><strong>Novas solicitações</strong><small>Aguardando análise</small></button>
+        <button class="feature-card"><span class="feature-icon">✓</span><strong>Confirmadas</strong><small>Programadas</small></button>
+        <button class="feature-card"><span class="feature-icon">↗</span><strong>Em andamento</strong><small>Transportes ativos</small></button>
+        <button class="feature-card"><span class="feature-icon">↩</span><strong>Aguardando retorno</strong><small>Pacientes no destino</small></button>
+      </div>
+
+      <div id="adminPanel" class="panel-grid hidden">
+        <button class="feature-card highlight"><span class="feature-icon">👥</span><strong>Usuários</strong><small>Perfis e acessos</small></button>
+        <button class="feature-card"><span class="feature-icon">🚑</span><strong>Frotas</strong><small>Cadastro operacional</small></button>
+        <button class="feature-card"><span class="feature-icon">☀</span><strong>Operação do dia</strong><small>Tripulação e disponibilidade</small></button>
+        <button class="feature-card"><span class="feature-icon">⚙</span><strong>Configurações</strong><small>Parâmetros do sistema</small></button>
+      </div>
+
+      <section id="fleetSummary" class="card fleet-card hidden">
+        <div class="section-title-row">
+          <h3>Frotas cadastradas</h3>
+          <span class="status-dot"></span>
+        </div>
+        <div class="fleet-item"><strong>Frota 1</strong><span>UTI</span><em>Disponível</em></div>
+        <div class="fleet-item"><strong>Frota 2</strong><span>Básica</span><em>Disponível</em></div>
+        <div class="fleet-item"><strong>Frota 3</strong><span>Básica</span><em>Disponível</em></div>
+      </section>
+
+      <section id="placeholder" class="card placeholder hidden">
+        <h3 id="placeholderTitle">Em construção</h3>
+        <p>Esta função será desenvolvida na próxima etapa.</p>
+        <button id="closePlaceholder" class="secondary-button" type="button">Voltar</button>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
