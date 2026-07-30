@@ -11,7 +11,14 @@
 </head>
 <body>
   <main id="app">
-    <section id="loginScreen" class="screen active">
+    <section id="welcomeScreen" class="screen welcome-screen active" aria-label="Abertura do Transporte HEURO">
+      <div class="welcome-art" role="img" aria-label="HEURO Transporte, Agendamentos e Operações, com ambulância institucional">
+        <button id="welcomeEnter" class="welcome-hotspot welcome-enter" type="button" aria-label="Entrar no aplicativo"></button>
+        <button id="welcomeChangeUser" class="welcome-hotspot welcome-change-user" type="button" aria-label="Trocar usuário"></button>
+      </div>
+    </section>
+
+    <section id="loginScreen" class="screen">
       <div class="brand-card"><div class="brand-mark">H</div><h1>Transporte HEURO</h1><p>Solicitação, registro e acompanhamento</p></div>
       <form id="loginForm" class="card form-card">
         <label for="userName">Usuário</label><input id="userName" type="text" value="Tiago" required />
