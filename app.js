@@ -1,6 +1,4 @@
-const welcomeStyles=document.createElement('link'); welcomeStyles.rel='stylesheet'; welcomeStyles.href='welcome.css'; document.head.appendChild(welcomeStyles);
 const $ = (id) => document.getElementById(id);
-const welcomeScreen = $('welcomeScreen');
 const loginScreen = $('loginScreen');
 const homeScreen = $('homeScreen');
 const views = ['requestView','listView','settingsView','detailView'].map($);
@@ -13,20 +11,9 @@ function cleanPhone(value){ const n=(value||'').replace(/\D/g,''); return n.star
 function formatDate(value){ if(!value) return 'Não informado'; const [y,m,d]=value.split('-'); return `${d}/${m}/${y}`; }
 function escapeHtml(value=''){ return String(value).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function protocol(){ const d=new Date(); const date=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`; return `HEURO-${date}-${String(Date.now()).slice(-5)}`; }
-function showScreen(screen){ welcomeScreen.classList.remove('active'); loginScreen.classList.remove('active'); homeScreen.classList.remove('active'); screen.classList.add('active'); }
+function showScreen(screen){ loginScreen.classList.remove('active'); homeScreen.classList.remove('active'); screen.classList.add('active'); }
 function showDashboard(){ views.forEach(v=>v.classList.add('hidden')); $('dashboard').classList.remove('hidden'); }
 function showView(id){ $('dashboard').classList.add('hidden'); views.forEach(v=>v.classList.add('hidden')); $(id).classList.remove('hidden'); if(id==='listView') renderList(); }
-
-$('welcomeEnter').addEventListener('click',()=>showScreen(loginScreen));
-$('welcomeChangeUser').addEventListener('click',()=>{
-  localStorage.removeItem('heuroUser');
-  sessionStorage.removeItem('heuroSession');
-  $('userName').value='';
-  $('password').value='';
-  $('profile').value='solicitante';
-  showScreen(loginScreen);
-  setTimeout(()=>$('userName').focus(),50);
-});
 
 $('loginForm').addEventListener('submit', e=>{
   e.preventDefault();
@@ -40,7 +27,7 @@ $('loginForm').addEventListener('submit', e=>{
   showScreen(homeScreen); showDashboard();
 });
 
-$('logoutButton').addEventListener('click',()=>{ sessionStorage.removeItem('heuroSession'); showScreen(welcomeScreen); });
+$('logoutButton').addEventListener('click',()=>{ sessionStorage.removeItem('heuroSession'); showScreen(loginScreen); });
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(`${b.dataset.view}View`)));
 document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',showDashboard));
 
@@ -94,4 +81,4 @@ function openDetail(id){
 }
 
 const saved=localStorage.getItem('heuroUser'); if(saved){ try{ const s=JSON.parse(saved); $('userName').value=s.name||'Tiago'; $('profile').value=s.profile||'solicitante'; }catch{} }
-if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
+if('serviceWorker' in navigator) window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js?v=8'));
