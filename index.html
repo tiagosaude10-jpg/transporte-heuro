@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b5fa5" />
   <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=12" />
+  <link rel="stylesheet" href="style.css?v=13" />
   <title>Transporte HEURO</title>
 </head>
 <body>
@@ -32,14 +32,34 @@
     </section>
 
     <section id="registerScreen" class="screen">
-      <div class="section-head page-head"><div><span class="eyebrow dark">Primeiro acesso</span><h2>Realizar cadastro</h2><p>Escolha o tipo de acesso e preencha seus dados.</p></div><button id="registerBack" class="back-button" type="button">Voltar</button></div>
-      <form id="registerForm" class="card form-card">
+      <div class="section-head page-head">
+        <div><span class="eyebrow dark">Primeiro acesso — Etapa 1</span><h2>Escolha o tipo de cadastro</h2><p>Selecione uma opção para continuar.</p></div>
+        <button id="registerBack" class="back-button" type="button">Voltar</button>
+      </div>
+      <div class="card form-card">
         <fieldset class="profile-options">
           <legend>Tipo de acesso solicitado</legend>
-          <label class="profile-option"><input type="radio" name="registerProfile" value="solicitante" required /><span><strong>Solicitante de transporte</strong><small>Profissional que realiza pedidos de transporte.</small></span></label>
-          <label class="profile-option"><input type="radio" name="registerProfile" value="transporte" required /><span><strong>Executante de transporte</strong><small>Profissional que recebe e executa os transportes.</small></span></label>
+          <label class="profile-option"><input type="radio" name="profileChoice" value="solicitante" /><span><strong>Solicitante de transporte</strong><small>Profissional que realiza pedidos de transporte.</small></span></label>
+          <label class="profile-option"><input type="radio" name="profileChoice" value="transporte" /><span><strong>Executante de transporte</strong><small>Profissional que recebe e executa os transportes.</small></span></label>
+          <label class="profile-option"><input type="radio" name="profileChoice" value="administrador" /><span><strong>Administrador</strong><small>Acesso administrativo sujeito à autorização de outro administrador.</small></span></label>
         </fieldset>
-        <p class="admin-access-note"><strong>Acesso administrativo:</strong> novos administradores são definidos exclusivamente por um administrador já autorizado, dentro do painel de usuários.</p>
+        <button id="continueRegister" class="primary-button" type="button">Continuar</button>
+        <p id="profileChoiceMessage" class="form-message" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="registerDetailsScreen" class="screen">
+      <div class="section-head page-head">
+        <div><span class="eyebrow dark">Primeiro acesso — Etapa 2</span><h2>Realizar cadastro</h2><p id="selectedProfileText">Preencha seus dados.</p></div>
+        <button id="registerDetailsBack" class="back-button" type="button">Voltar</button>
+      </div>
+      <form id="registerForm" class="card form-card">
+        <div hidden>
+          <label><input type="radio" name="registerProfile" value="solicitante" /></label>
+          <label><input type="radio" name="registerProfile" value="transporte" /></label>
+          <label><input type="radio" name="registerProfile" value="administrador" /></label>
+        </div>
+        <p class="admin-access-note"><strong>Perfil escolhido:</strong> <span id="selectedProfileLabel">Não selecionado</span>. O acesso somente será liberado após autorização de um administrador.</p>
         <label for="fullName">Nome completo</label><input id="fullName" type="text" autocomplete="name" required />
         <label for="cpf">CPF</label><input id="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
         <label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required />
@@ -58,7 +78,7 @@
       <div id="dashboard" class="panel-grid">
         <button id="newRequestCard" class="feature-card highlight" data-view="request"><span class="feature-icon">＋</span><strong>Nova solicitação</strong><small>Registrar pedido de transporte</small></button>
         <button class="feature-card" data-view="list"><span class="feature-icon">▤</span><strong>Solicitações</strong><small>Consultar e concluir pedidos</small></button>
-        <button id="usersCard" class="feature-card hidden" data-view="users"><span class="feature-icon">✓</span><strong>Autorizar usuários</strong><small>Aprovar solicitantes, executantes e definir novos administradores</small><span id="pendingBadge" class="badge hidden">0</span></button>
+        <button id="usersCard" class="feature-card hidden" data-view="users"><span class="feature-icon">✓</span><strong>Autorizar usuários</strong><small>Aprovar solicitantes, executantes e administradores</small><span id="pendingBadge" class="badge hidden">0</span></button>
         <button id="settingsCard" class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Número do WhatsApp</small></button>
       </div>
 
@@ -86,11 +106,12 @@
       </section>
 
       <section id="listView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div><div id="requestList" class="request-list"></div></section>
-      <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3><p>Autorize cadastros e, quando necessário, altere o perfil para Administrador antes da liberação.</p></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
+      <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3><p>Autorize os cadastros enviados para aprovação.</p></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
       <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração</span><h3>WhatsApp do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>Número com DDD<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" /></label><p class="help">Informe somente números. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar número</button></form></section>
       <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
     </section>
   </main>
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
+  <script src="register-flow.js?v=13"></script>
 </body>
 </html>
