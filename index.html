@@ -6,20 +6,12 @@
   <meta name="theme-color" content="#0b5fa5" />
   <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=6" />
-  <link rel="stylesheet" href="welcome.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=8" />
   <title>Transporte HEURO</title>
 </head>
 <body>
   <main id="app">
-    <section id="welcomeScreen" class="screen welcome-screen active" aria-label="Abertura do Transporte HEURO">
-      <div class="welcome-art" role="img" aria-label="HEURO Transporte, Agendamentos e Operações, com ambulância institucional">
-        <button id="welcomeEnter" class="welcome-hotspot welcome-enter" type="button" aria-label="Entrar no aplicativo"></button>
-        <button id="welcomeChangeUser" class="welcome-hotspot welcome-change-user" type="button" aria-label="Trocar usuário"></button>
-      </div>
-    </section>
-
-    <section id="loginScreen" class="screen">
+    <section id="loginScreen" class="screen active">
       <div class="brand-card"><div class="brand-mark">H</div><h1>Transporte HEURO</h1><p>Solicitação, registro e acompanhamento</p></div>
       <form id="loginForm" class="card form-card">
         <label for="userName">Usuário</label><input id="userName" type="text" value="Tiago" required />
@@ -91,6 +83,6 @@
       <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
     </section>
   </main>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
