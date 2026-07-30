@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b5fa5" />
   <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
   <title>Transporte HEURO</title>
 </head>
 <body>
@@ -69,13 +69,13 @@
             <label>Nome do paciente<input id="patient" required /></label>
             <label>Data de nascimento<input id="birthDate" type="date" /></label>
             <label>Setor de origem<select id="originSector" required><option value="">Selecione o setor</option><option>Sala Vermelha</option><option>Clínica Médica</option><option>Clínica Cirúrgica/Ortopédica</option><option>Clínica Geral</option><option>UTI</option><option>Centro Cirúrgico</option></select></label>
-            <div class="location-group"><span class="group-label">Local de origem</span><div class="location-fields"><label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label><label>Leito<input id="bed" placeholder="Ex.: 08" /></label></div></div>
+            <div id="boxLocation" class="location-group hidden"><span class="group-label">Local de origem</span><div class="location-fields single-field"><label>Box<input id="boxNumber" inputmode="numeric" placeholder="Ex.: 03" /></label></div></div>
+            <div id="wardLocation" class="location-group"><span class="group-label">Local de origem</span><div class="location-fields"><label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label><label>Leito<input id="bed" placeholder="Ex.: 08" /></label></div></div>
             <label>Unidade de destino<input id="destination" required /></label>
             <label>Data do transporte<input id="transportDate" type="date" required /></label>
             <label>Horário previsto<input id="transportTime" type="time" required /></label>
-            <label>Tipo de ambulância<select id="ambulanceType"><option>Suporte básico</option><option>Suporte avançado / UTI</option><option>Transporte sanitário</option></select></label>
+            <label>Tipo de ambulância<select id="ambulanceType"><option>Suporte básico</option><option>UTI</option></select></label>
             <label>Prioridade<select id="priority"><option>Programado</option><option>Urgente</option><option>Emergência</option></select></label>
-            <label>Equipe necessária<select id="team"><option>Motorista</option><option>Motorista + técnico de enfermagem</option><option>Motorista + enfermeiro</option><option>Motorista + enfermeiro + médico</option></select></label>
             <label>Oxigênio<select id="oxygen"><option>Não</option><option>Sim</option></select></label>
           </div>
           <label>Contato do setor solicitante<input id="contact" inputmode="tel" /></label>
@@ -86,14 +86,11 @@
       </section>
 
       <section id="listView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div><div id="requestList" class="request-list"></div></section>
-
       <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
-
       <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração</span><h3>WhatsApp do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>Número com DDD<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" /></label><p class="help">Informe somente números. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar número</button></form></section>
-
       <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
     </section>
   </main>
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>
