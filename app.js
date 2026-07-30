@@ -40,21 +40,22 @@ $('requestForm').addEventListener('submit',e=>{
   const item={
     id:crypto.randomUUID ? crypto.randomUUID() : String(Date.now()), protocol:protocol(), status:'Solicitado', createdAt:new Date().toISOString(),
     requester:JSON.parse(sessionStorage.getItem('heuroSession')||'{}').name||'Usuário', patient:$('patient').value.trim(), birthDate:$('birthDate').value,
-    origin:$('origin').value.trim(), destination:$('destination').value.trim(), transportDate:$('transportDate').value, transportTime:$('transportTime').value,
+    originSector:$('originSector').value, ward:$('ward').value.trim(), bed:$('bed').value.trim(), destination:$('destination').value.trim(),
+    transportDate:$('transportDate').value, transportTime:$('transportTime').value,
     ambulanceType:$('ambulanceType').value, priority:$('priority').value, team:$('team').value, oxygen:$('oxygen').value,
     contact:$('contact').value.trim(), notes:$('notes').value.trim(), attachmentName:file?file.name:'Nenhum documento informado'
   };
-  const data=requests(); data.unshift(item); saveRequests(data); $('requestForm').reset(); $('origin').value='HEURO'; alert(`Solicitação ${item.protocol} salva.`); openDetail(item.id);
+  const data=requests(); data.unshift(item); saveRequests(data); $('requestForm').reset(); alert(`Solicitação ${item.protocol} salva.`); openDetail(item.id);
 });
 
 function renderList(){
   const data=requests(); const box=$('requestList');
   if(!data.length){ box.innerHTML='<div class="card empty">Nenhuma solicitação registrada neste aparelho.</div>'; return; }
-  box.innerHTML=data.map(r=>`<button class="request-card" data-id="${r.id}"><span class="status ${r.status==='Concluído'?'done':''}">${r.status}</span><strong>${escapeHtml(r.patient)}</strong><small>${escapeHtml(r.protocol)}</small><small>${formatDate(r.transportDate)} às ${escapeHtml(r.transportTime)}</small><span>${escapeHtml(r.origin)} → ${escapeHtml(r.destination)}</span></button>`).join('');
+  box.innerHTML=data.map(r=>`<button class="request-card" data-id="${r.id}"><span class="status ${r.status==='Concluído'?'done':''}">${r.status}</span><strong>${escapeHtml(r.patient)}</strong><small>${escapeHtml(r.protocol)}</small><small>${formatDate(r.transportDate)} às ${escapeHtml(r.transportTime)}</small><span>${escapeHtml(r.originSector||r.origin||'Origem não informada')} → ${escapeHtml(r.destination)}</span></button>`).join('');
   box.querySelectorAll('[data-id]').forEach(b=>b.addEventListener('click',()=>openDetail(b.dataset.id)));
 }
 
-function message(r){ return `*SOLICITAÇÃO DE TRANSPORTE HEURO*\n\nProtocolo: ${r.protocol}\nPaciente: ${r.patient}\nOrigem: ${r.origin}\nDestino: ${r.destination}\nData: ${formatDate(r.transportDate)} às ${r.transportTime}\nAmbulância: ${r.ambulanceType}\nPrioridade: ${r.priority}\nEquipe: ${r.team}\nOxigênio: ${r.oxygen}\nDocumento: ${r.attachmentName}\nObservações: ${r.notes||'Sem observações'}\n\nSolicitação registrada no aplicativo Transporte HEURO.`; }
+function message(r){ return `*SOLICITAÇÃO DE TRANSPORTE HEURO*\n\nProtocolo: ${r.protocol}\nPaciente: ${r.patient}\nSetor de origem: ${r.originSector||r.origin||'Não informado'}\nEnfermaria: ${r.ward||'Não informada'}\nLeito: ${r.bed||'Não informado'}\nDestino: ${r.destination}\nData: ${formatDate(r.transportDate)} às ${r.transportTime}\nAmbulância: ${r.ambulanceType}\nPrioridade: ${r.priority}\nEquipe: ${r.team}\nOxigênio: ${r.oxygen}\nDocumento: ${r.attachmentName}\nObservações: ${r.notes||'Sem observações'}\n\nSolicitação registrada no aplicativo Transporte HEURO.`; }
 
 function openDetail(id){
   const r=requests().find(x=>x.id===id); if(!r) return;
@@ -65,7 +66,8 @@ function openDetail(id){
     <div class="detail-grid">
       <p><b>Status</b><span>${escapeHtml(r.status)}</span></p><p><b>Paciente</b><span>${escapeHtml(r.patient)}</span></p>
       <p><b>Nascimento</b><span>${formatDate(r.birthDate)}</span></p><p><b>Solicitante</b><span>${escapeHtml(r.requester)}</span></p>
-      <p><b>Origem</b><span>${escapeHtml(r.origin)}</span></p><p><b>Destino</b><span>${escapeHtml(r.destination)}</span></p>
+      <p><b>Setor de origem</b><span>${escapeHtml(r.originSector||r.origin||'Não informado')}</span></p><p><b>Destino</b><span>${escapeHtml(r.destination)}</span></p>
+      <p><b>Enfermaria</b><span>${escapeHtml(r.ward||'Não informada')}</span></p><p><b>Leito</b><span>${escapeHtml(r.bed||'Não informado')}</span></p>
       <p><b>Data e hora</b><span>${formatDate(r.transportDate)} às ${escapeHtml(r.transportTime)}</span></p><p><b>Prioridade</b><span>${escapeHtml(r.priority)}</span></p>
       <p><b>Ambulância</b><span>${escapeHtml(r.ambulanceType)}</span></p><p><b>Equipe</b><span>${escapeHtml(r.team)}</span></p>
       <p><b>Oxigênio</b><span>${escapeHtml(r.oxygen)}</span></p><p><b>Contato</b><span>${escapeHtml(r.contact||'Não informado')}</span></p>
