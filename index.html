@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b5fa5" />
   <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="stylesheet" href="style.css?v=14" />
   <title>Transporte HEURO</title>
 </head>
 <body>
@@ -79,7 +79,7 @@
         <button id="newRequestCard" class="feature-card highlight" data-view="request"><span class="feature-icon">＋</span><strong>Nova solicitação</strong><small>Registrar pedido de transporte</small></button>
         <button class="feature-card" data-view="list"><span class="feature-icon">▤</span><strong>Solicitações</strong><small>Consultar e concluir pedidos</small></button>
         <button id="usersCard" class="feature-card hidden" data-view="users"><span class="feature-icon">✓</span><strong>Autorizar usuários</strong><small>Aprovar solicitantes, executantes e administradores</small><span id="pendingBadge" class="badge hidden">0</span></button>
-        <button id="settingsCard" class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Número do WhatsApp</small></button>
+        <button id="settingsCard" class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Números do WhatsApp</small></button>
       </div>
 
       <section id="requestView" class="card content-view hidden">
@@ -107,11 +107,12 @@
 
       <section id="listView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div><div id="requestList" class="request-list"></div></section>
       <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3><p>Autorize os cadastros enviados para aprovação.</p></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
-      <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração</span><h3>WhatsApp do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>Número com DDD<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" /></label><p class="help">Informe somente números. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar número</button></form></section>
+      <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração administrativa</span><h3>Números do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>WhatsApp — Transporte básico<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" required /></label><p class="help">Informe somente números com DDD. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar números</button></form></section>
       <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
     </section>
   </main>
-  <script src="app.js?v=13"></script>
-  <script src="register-flow.js?v=13"></script>
+  <script src="app.js?v=14"></script>
+  <script src="register-flow.js?v=14"></script>
+  <script src="whatsapp-routing.js?v=1"></script>
 </body>
 </html>
