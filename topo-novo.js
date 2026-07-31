@@ -1,5 +1,25 @@
 (()=>{
   'use strict';
+
+  document.title='Transporte HEURO';
+  const addHeadLink=(rel,href,extra={})=>{
+    let link=document.head.querySelector(`link[rel="${rel}"]`);
+    if(!link){link=document.createElement('link');link.rel=rel;document.head.appendChild(link);}
+    link.href=href;
+    Object.entries(extra).forEach(([key,value])=>link.setAttribute(key,value));
+  };
+  const addMeta=(name,content)=>{
+    let meta=document.head.querySelector(`meta[name="${name}"]`);
+    if(!meta){meta=document.createElement('meta');meta.name=name;document.head.appendChild(meta);}
+    meta.content=content;
+  };
+  addHeadLink('manifest','manifest-novo.json?v=1');
+  addHeadLink('apple-touch-icon','AC1F8155-6FA3-4763-B069-50086DF91DD6.png?v=1',{sizes:'1024x1024'});
+  addMeta('apple-mobile-web-app-capable','yes');
+  addMeta('apple-mobile-web-app-status-bar-style','black-translucent');
+  addMeta('apple-mobile-web-app-title','HEURO Transporte');
+  addMeta('mobile-web-app-capable','yes');
+
   const $=id=>document.getElementById(id);
   const readRequests=()=>{try{return JSON.parse(localStorage.getItem('heuroRequests')||'[]')}catch{return[]}};
   const readUsers=()=>{try{return JSON.parse(localStorage.getItem('heuroUsers')||'[]')}catch{return[]}};
