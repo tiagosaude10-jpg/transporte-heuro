@@ -2,6 +2,9 @@
   const BASIC_KEY = 'heuroWhatsappBasic';
   const UTI_KEY = 'heuroWhatsappUti';
   const LEGACY_KEY = 'heuroWhatsapp';
+  const DB_NAME = 'heuroTransportFiles';
+  const STORE_NAME = 'attachments';
+  let pendingAttachment = null;
 
   const digits = (value) => String(value || '').replace(/\D/g, '');
   const withBrazilCode = (value) => {
@@ -10,19 +13,13 @@
   };
 
   function currentSession() {
-    try {
-      return JSON.parse(sessionStorage.getItem('heuroSession') || 'null');
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(sessionStorage.getItem('heuroSession') || 'null'); }
+    catch { return null; }
   }
 
   function getRequests() {
-    try {
-      return JSON.parse(localStorage.getItem('heuroRequests') || '[]');
-    } catch {
-      return [];
-    }
+    try { return JSON.parse(localStorage.getItem('heuroRequests') || '[]'); }
+    catch { return []; }
   }
 
   function formatDate(value) {
@@ -46,8 +43,9 @@
   }
 
   function configuredNumberFor(request) {
-    if (isUtiRequest(request)) return localStorage.getItem(UTI_KEY) || '';
-    return localStorage.getItem(BASIC_KEY) || localStorage.getItem(LEGACY_KEY) || '';
+    return isUtiRequest(request)
+      ? localStorage.getItem(UTI_KEY) || ''
+      : localStorage.getItem(BASIC_KEY) || localStorage.getItem(LEGACY_KEY) || '';
   }
 
   function findVisibleRequest() {
@@ -56,149 +54,207 @@
     return getRequests().find((item) => item.protocol === protocol) || null;
   }
 
-  function ensureStyles() {
-    if (document.getElementById('companyWhatsappStyles')) return;
-    const style = document.createElement('style');
-    style.id = 'companyWhatsappStyles';
-    style.textContent = `
-      #companyWhatsappScreen{background:#f6f8fb;min-height:100vh;padding-bottom:105px}
-      .company-whatsapp-header{background:linear-gradient(135deg,#0b67b4,#06469e);color:#fff;border-radius:0 0 34px 34px;padding:calc(24px + env(safe-area-inset-top)) 22px 28px}
-      .company-whatsapp-header button{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.12);color:#fff;border-radius:12px;padding:10px 13px;font-size:1rem}
-      .company-whatsapp-header h2{margin:24px 0 5px;font-size:1.65rem}.company-whatsapp-header p{margin:0;color:#d8e9ff}
-      .company-whatsapp-body{padding:20px 18px}.company-whatsapp-note{background:#eef6ff;border:1px solid #cfe3ff;border-radius:16px;padding:14px;color:#174a84;margin-bottom:18px;line-height:1.4}
-      .company-whatsapp-form{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:18px;box-shadow:0 6px 20px rgba(27,67,122,.08)}
-      .company-whatsapp-form label{display:block;font-weight:800;color:#172033;margin-bottom:18px}.company-whatsapp-form label small{display:block;font-weight:400;color:#667085;margin:5px 0 9px;line-height:1.35}
-      .company-whatsapp-form input{width:100%;box-sizing:border-box;border:1px solid #cfd7e5;border-radius:13px;padding:14px;font-size:1rem;background:#fff;color:#172033}
-      .company-whatsapp-form input:focus{outline:2px solid #8ec0ff;border-color:#0b67b4}
-      .company-whatsapp-save{width:100%;border:0;border-radius:14px;padding:15px;background:#0b67b4;color:#fff;font-size:1rem;font-weight:800}
-      .company-whatsapp-status{margin-top:14px;border-radius:13px;padding:12px;text-align:center;font-weight:700;display:none}.company-whatsapp-status.success{display:block;background:#ecfdf3;color:#087443;border:1px solid #b7ebcc}.company-whatsapp-status.error{display:block;background:#fff1f2;color:#b42318;border:1px solid #fecdd3}
-    `;
-    document.head.appendChild(style);
-  }
-
-  function ensureCompanyWhatsappScreen() {
-    if (document.getElementById('companyWhatsappScreen')) return;
-    ensureStyles();
-    const screen = document.createElement('section');
-    screen.id = 'companyWhatsappScreen';
-    screen.className = 'screen';
-    screen.innerHTML = `
-      <header class="company-whatsapp-header">
-        <button type="button" id="companyWhatsappBack">← Voltar</button>
-        <h2>WhatsApp da Empresa</h2>
-        <p>Cadastro dos números de envio</p>
-      </header>
-      <div class="company-whatsapp-body">
-        <div class="company-whatsapp-note"><strong>Envio automático.</strong><br>O aplicativo escolherá o número correto de acordo com o tipo de ambulância selecionado na solicitação.</div>
-        <form id="companyWhatsappForm" class="company-whatsapp-form">
-          <label>WhatsApp — Transporte Básico
-            <small>Receberá as solicitações marcadas como Suporte básico.</small>
-            <input id="companyWhatsappBasic" inputmode="numeric" autocomplete="tel" placeholder="Ex.: 69999999999" required>
-          </label>
-          <label>WhatsApp — Transporte UTI
-            <small>Receberá as solicitações marcadas como UTI.</small>
-            <input id="companyWhatsappUti" inputmode="numeric" autocomplete="tel" placeholder="Ex.: 69999999999" required>
-          </label>
-          <button class="company-whatsapp-save" type="submit">Salvar números</button>
-          <div id="companyWhatsappStatus" class="company-whatsapp-status" role="status"></div>
-        </form>
-      </div>`;
-    document.getElementById('app')?.appendChild(screen);
-
-    screen.querySelector('#companyWhatsappBack').addEventListener('click', () => {
-      screen.classList.remove('active');
-      const adminPanel = document.getElementById('adminPanelScreen');
-      if (adminPanel) adminPanel.classList.add('active');
-      window.scrollTo(0, 0);
-    });
-
-    screen.querySelector('#companyWhatsappForm').addEventListener('submit', (event) => {
-      event.preventDefault();
-      const status = screen.querySelector('#companyWhatsappStatus');
-      const session = currentSession();
-      if (session?.profile !== 'administrador') {
-        status.textContent = 'Apenas administradores podem alterar estes números.';
-        status.className = 'company-whatsapp-status error';
-        return;
-      }
-      const basic = digits(screen.querySelector('#companyWhatsappBasic').value);
-      const uti = digits(screen.querySelector('#companyWhatsappUti').value);
-      if (basic.length < 10 || basic.length > 13 || uti.length < 10 || uti.length > 13) {
-        status.textContent = 'Informe os dois números corretamente, com DDD.';
-        status.className = 'company-whatsapp-status error';
-        return;
-      }
-      localStorage.setItem(BASIC_KEY, basic);
-      localStorage.setItem(UTI_KEY, uti);
-      localStorage.setItem(LEGACY_KEY, basic);
-      const oldBasic = document.getElementById('whatsappNumber');
-      const oldUti = document.getElementById('whatsappUtiNumber');
-      if (oldBasic) oldBasic.value = basic;
-      if (oldUti) oldUti.value = uti;
-      status.textContent = 'Números da empresa cadastrados com sucesso.';
-      status.className = 'company-whatsapp-status success';
+  function openDb() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
     });
   }
 
-  function openCompanyWhatsappScreen() {
-    if (currentSession()?.profile !== 'administrador') {
-      alert('Esta área é exclusiva para administradores.');
-      return;
+  async function saveAttachment(requestId, file) {
+    if (!requestId || !file) return;
+    const db = await openDb();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put({ blob: file, name: file.name, type: file.type }, requestId);
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+  }
+
+  async function getAttachment(requestId) {
+    const db = await openDb();
+    const result = await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const req = tx.objectStore(STORE_NAME).get(requestId);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+    db.close();
+    return result;
+  }
+
+  function loadScript(src, globalName) {
+    if (globalName && window[globalName]) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const existing = [...document.scripts].find((script) => script.src === src);
+      if (existing) {
+        existing.addEventListener('load', resolve, { once: true });
+        existing.addEventListener('error', reject, { once: true });
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  async function ensureJsPdf() {
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js', 'jspdf');
+    if (!window.jspdf?.jsPDF) throw new Error('Não foi possível carregar o gerador de PDF.');
+  }
+
+  function addField(doc, label, value, x, y, width = 82) {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(95, 115, 135);
+    doc.text(label, x, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(12);
+    doc.setTextColor(18, 48, 78);
+    const lines = doc.splitTextToSize(String(value || 'Não informado'), width);
+    doc.text(lines, x, y + 6);
+    return y + 6 + (lines.length * 5);
+  }
+
+  async function imageDimensions(dataUrl) {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      image.onerror = reject;
+      image.src = dataUrl;
+    });
+  }
+
+  async function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function buildPdfBlob(request) {
+    await ensureJsPdf();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(17);
+    doc.setTextColor(18, 48, 78);
+    doc.text('TRANSPORTE HEURO', 105, 16, { align: 'center' });
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(90, 105, 120);
+    doc.text('Solicitação de transporte', 105, 23, { align: 'center' });
+    doc.setDrawColor(215, 225, 235);
+    doc.line(15, 28, 195, 28);
+
+    let yLeft = 38;
+    let yRight = 38;
+    yLeft = addField(doc, 'Status', request.status, 16, yLeft);
+    yRight = addField(doc, 'Paciente', request.patient, 108, yRight);
+    yLeft = addField(doc, 'Nascimento', formatDate(request.birthDate), 16, yLeft + 5);
+    yRight = addField(doc, 'Solicitante', request.requester, 108, yRight + 5);
+    yLeft = addField(doc, 'Setor de origem', request.originSector || request.origin, 16, yLeft + 5);
+    yRight = addField(doc, 'Destino', request.destination, 108, yRight + 5);
+    yLeft = addField(doc, request.boxNumber ? 'Box' : 'Enfermaria / Leito', request.boxNumber || `${request.ward || 'Não informada'} / ${request.bed || 'Não informado'}`, 16, yLeft + 5);
+    yRight = addField(doc, 'Data e hora', `${formatDate(request.transportDate)} às ${request.transportTime}`, 108, yRight + 5);
+    yLeft = addField(doc, 'Prioridade', request.priority, 16, yLeft + 5);
+    yRight = addField(doc, 'Ambulância', request.ambulanceType, 108, yRight + 5);
+    yLeft = addField(doc, 'Oxigênio', request.oxygen, 16, yLeft + 5);
+    yRight = addField(doc, 'Contato', request.contact || 'Não informado', 108, yRight + 5);
+
+    let y = Math.max(yLeft, yRight) + 8;
+    y = addField(doc, 'Documento da regulação', request.attachmentName, 16, y, 178) + 5;
+    addField(doc, 'Observações', request.notes || 'Sem observações', 16, y, 178);
+
+    const attachment = await getAttachment(request.id);
+    if (attachment?.blob && attachment.type?.startsWith('image/')) {
+      const dataUrl = await blobToDataUrl(attachment.blob);
+      const dimensions = await imageDimensions(dataUrl);
+      doc.addPage();
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(18, 48, 78);
+      doc.text('DOCUMENTO DA REGULAÇÃO', 105, 16, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(90, 105, 120);
+      doc.text(attachment.name || request.attachmentName, 105, 22, { align: 'center' });
+      const maxWidth = 180;
+      const maxHeight = 258;
+      const ratio = Math.min(maxWidth / dimensions.width, maxHeight / dimensions.height);
+      const width = dimensions.width * ratio;
+      const height = dimensions.height * ratio;
+      const x = (210 - width) / 2;
+      const imageType = attachment.type.includes('png') ? 'PNG' : 'JPEG';
+      doc.addImage(dataUrl, imageType, x, 29, width, height, undefined, 'FAST');
     }
-    ensureCompanyWhatsappScreen();
-    document.querySelectorAll('.screen').forEach((item) => item.classList.remove('active'));
-    const screen = document.getElementById('companyWhatsappScreen');
-    screen.querySelector('#companyWhatsappBasic').value = localStorage.getItem(BASIC_KEY) || localStorage.getItem(LEGACY_KEY) || '';
-    screen.querySelector('#companyWhatsappUti').value = localStorage.getItem(UTI_KEY) || '';
-    const status = screen.querySelector('#companyWhatsappStatus');
-    status.textContent = '';
-    status.className = 'company-whatsapp-status';
-    screen.classList.add('active');
-    window.scrollTo(0, 0);
+
+    return doc.output('blob');
   }
 
-  function ensureAdminButton() {
-    const adminPanel = document.getElementById('adminPanelScreen');
-    if (!adminPanel || adminPanel.querySelector('[data-admin="company-whatsapp"]')) return;
-    const settingsButton = adminPanel.querySelector('[data-admin="settings"]');
-    const grid = settingsButton?.closest('.admin-grid');
-    if (!grid) return;
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'admin-card tone-green';
-    button.dataset.admin = 'company-whatsapp';
-    button.innerHTML = '<span class="icon">📱</span><span><strong>WhatsApp da Empresa</strong><small>Cadastrar números de envio</small></span>';
-    grid.insertBefore(button, settingsButton);
-    button.addEventListener('click', openCompanyWhatsappScreen);
+  async function sharePdf(request) {
+    const button = document.getElementById('whatsappButton');
+    const originalText = button?.textContent;
+    if (button) { button.disabled = true; button.textContent = 'Preparando PDF...'; }
+    try {
+      const pdfBlob = await buildPdfBlob(request);
+      const file = new File([pdfBlob], `Transporte HEURO - ${request.protocol}.pdf`, { type: 'application/pdf' });
+      const text = buildMessage(request);
+      const number = configuredNumberFor(request);
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ title: `Transporte HEURO - ${request.protocol}`, text, files: [file] });
+        return;
+      }
+
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+      if (number) window.open(`https://wa.me/${withBrazilCode(number)}?text=${encodeURIComponent(text)}`, '_blank');
+      else alert('PDF salvo. Cadastre o número do transporte para abrir o WhatsApp automaticamente.');
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        console.error(error);
+        alert('Não foi possível gerar ou compartilhar o PDF. Verifique a internet e tente novamente.');
+      }
+    } finally {
+      if (button) { button.disabled = false; button.textContent = originalText || 'Encaminhar ao WhatsApp'; }
+    }
   }
 
-  function ensureSettingsFields() {
-    const form = document.getElementById('settingsForm');
-    const oldInput = document.getElementById('whatsappNumber');
-    if (!form || !oldInput || document.getElementById('whatsappUtiNumber')) return;
-    const oldLabel = oldInput.closest('label');
-    if (oldLabel) oldLabel.firstChild.textContent = 'WhatsApp — Transporte básico';
-    oldInput.value = localStorage.getItem(BASIC_KEY) || localStorage.getItem(LEGACY_KEY) || '';
-    const utiLabel = document.createElement('label');
-    utiLabel.textContent = 'WhatsApp — Transporte UTI';
-    const utiInput = document.createElement('input');
-    utiInput.id = 'whatsappUtiNumber';
-    utiInput.inputMode = 'numeric';
-    utiInput.placeholder = 'Ex.: 69999999999';
-    utiInput.required = true;
-    utiInput.value = localStorage.getItem(UTI_KEY) || '';
-    utiLabel.appendChild(utiInput);
-    const help = form.querySelector('.help');
-    form.insertBefore(utiLabel, help || form.querySelector('button'));
-  }
-
-  function saveLegacySettings(event) {
-    if (event.target?.id !== 'settingsForm') return;
-    const basic = digits(document.getElementById('whatsappNumber')?.value);
-    const uti = digits(document.getElementById('whatsappUtiNumber')?.value);
-    if (basic) localStorage.setItem(BASIC_KEY, basic);
-    if (uti) localStorage.setItem(UTI_KEY, uti);
-    if (basic) localStorage.setItem(LEGACY_KEY, basic);
+  function captureAttachment(event) {
+    if (event.target?.id !== 'requestForm') return;
+    const file = document.getElementById('attachment')?.files?.[0];
+    pendingAttachment = file || null;
+    if (!pendingAttachment) return;
+    setTimeout(async () => {
+      try {
+        const newest = getRequests()[0];
+        if (newest) await saveAttachment(newest.id, pendingAttachment);
+      } catch (error) {
+        console.error('Falha ao guardar o documento da regulação:', error);
+      } finally {
+        pendingAttachment = null;
+      }
+    }, 150);
   }
 
   function routeWhatsapp(event) {
@@ -209,22 +265,74 @@
     event.preventDefault();
     event.stopImmediatePropagation();
     const number = configuredNumberFor(request);
-    const destinationLabel = isUtiRequest(request) ? 'UTI' : 'transporte básico';
     if (!number) {
+      const destinationLabel = isUtiRequest(request) ? 'UTI' : 'transporte básico';
       alert(`O número do ${destinationLabel} ainda não foi cadastrado. Entre como administrador e acesse Mais > WhatsApp da Empresa.`);
       return;
     }
-    window.open(`https://wa.me/${withBrazilCode(number)}?text=${encodeURIComponent(buildMessage(request))}`, '_blank');
+    sharePdf(request);
   }
 
-  document.addEventListener('submit', saveLegacySettings, true);
+  function routePrint(event) {
+    const button = event.target.closest('#printButton');
+    if (!button) return;
+    const request = findVisibleRequest();
+    if (!request) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    buildPdfBlob(request).then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Transporte HEURO - ${request.protocol}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }).catch((error) => {
+      console.error(error);
+      alert('Não foi possível gerar o PDF. Verifique a internet e tente novamente.');
+    });
+  }
+
+  function ensureSettingsFields() {
+    const form = document.getElementById('settingsForm');
+    const oldInput = document.getElementById('whatsappNumber');
+    if (!form || !oldInput) return;
+    oldInput.value = localStorage.getItem(BASIC_KEY) || localStorage.getItem(LEGACY_KEY) || oldInput.value || '';
+    if (!document.getElementById('whatsappUtiNumber')) {
+      const oldLabel = oldInput.closest('label');
+      if (oldLabel) oldLabel.firstChild.textContent = 'WhatsApp — Transporte básico';
+      const label = document.createElement('label');
+      label.textContent = 'WhatsApp — Transporte UTI';
+      const input = document.createElement('input');
+      input.id = 'whatsappUtiNumber';
+      input.inputMode = 'numeric';
+      input.placeholder = 'Ex.: 69999999999';
+      input.required = true;
+      input.value = localStorage.getItem(UTI_KEY) || '';
+      label.appendChild(input);
+      form.insertBefore(label, form.querySelector('.help') || form.querySelector('button'));
+    }
+  }
+
+  function saveSettings(event) {
+    if (event.target?.id !== 'settingsForm') return;
+    const basic = digits(document.getElementById('whatsappNumber')?.value);
+    const uti = digits(document.getElementById('whatsappUtiNumber')?.value);
+    if (basic) {
+      localStorage.setItem(BASIC_KEY, basic);
+      localStorage.setItem(LEGACY_KEY, basic);
+    }
+    if (uti) localStorage.setItem(UTI_KEY, uti);
+  }
+
+  document.addEventListener('submit', captureAttachment, true);
+  document.addEventListener('submit', saveSettings, true);
   document.addEventListener('click', routeWhatsapp, true);
-  const observer = new MutationObserver(() => {
-    ensureAdminButton();
-    ensureSettingsFields();
-  });
+  document.addEventListener('click', routePrint, true);
+
+  const observer = new MutationObserver(ensureSettingsFields);
   observer.observe(document.documentElement, { childList: true, subtree: true });
-  ensureCompanyWhatsappScreen();
-  ensureAdminButton();
   ensureSettingsFields();
 })();
