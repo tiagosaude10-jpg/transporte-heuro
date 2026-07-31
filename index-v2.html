@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b5fa5" />
+  <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css?v=15" />
+  <title>Transporte HEURO — Versão 2</title>
+
+  <style>
+    /* Página de comando construída diretamente no HTML, sem home-layout-fix.js */
+    #homeScreen.screen {
+      padding: 0;
+      background: #fff;
+    }
+
+    #homeScreen .topbar {
+      display: none !important;
+    }
+
+    #dashboard.command-image-dashboard {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    #dashboard.command-image-dashboard.hidden {
+      display: none !important;
+    }
+
+    .command-image-frame {
+      position: relative;
+      width: 100%;
+      line-height: 0;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .command-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 0;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .command-hotspot {
+      position: absolute;
+      z-index: 5;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      appearance: none;
+      -webkit-appearance: none;
+      touch-action: manipulation;
+    }
+
+    .command-hotspot:focus-visible {
+      outline: 3px solid rgba(11, 95, 165, .55);
+      outline-offset: -3px;
+    }
+
+    .command-system-control {
+      display: none !important;
+    }
+
+    /* Coordenadas proporcionais sobre a imagem 896 x 1683 */
+    .hotspot-bell          { left: 63.0%; top: 2.4%;  width: 10.5%; height: 5.2%; }
+    .hotspot-logout        { left: 75.5%; top: 2.2%;  width: 21.0%; height: 5.8%; }
+
+    .hotspot-new-request   { left: 4.4%;  top: 29.0%; width: 91.0%; height: 10.8%; }
+    .hotspot-team          { left: 4.4%;  top: 40.7%; width: 91.0%; height: 10.9%; }
+
+    .hotspot-pending       { left: 4.4%;  top: 55.8%; width: 91.0%; height: 6.7%; }
+    .hotspot-agenda        { left: 4.4%;  top: 63.0%; width: 91.0%; height: 6.8%; }
+    .hotspot-history       { left: 4.4%;  top: 70.3%; width: 91.0%; height: 6.8%; }
+
+    .hotspot-home          { left: 2.5%;  top: 92.4%; width: 18.5%; height: 7.4%; }
+    .hotspot-transport     { left: 20.5%; top: 92.4%; width: 20.5%; height: 7.4%; }
+    .hotspot-notifications { left: 40.5%; top: 92.4%; width: 21.0%; height: 7.4%; }
+    .hotspot-profile       { left: 61.0%; top: 92.4%; width: 18.5%; height: 7.4%; }
+    .hotspot-more          { left: 79.0%; top: 92.4%; width: 18.5%; height: 7.4%; }
+
+    #homeScreen > .content-view {
+      margin: 18px;
+    }
+  </style>
+</head>
+
+<body>
+  <main id="app">
+    <section id="welcomeScreen" class="screen welcome-screen active" aria-label="Tela inicial do Transporte HEURO">
+      <div class="welcome-frame">
+        <img class="welcome-image" src="IMG_1774.webp" alt="HEURO Transporte — Agendamentos e Operações" />
+        <button id="welcomeEnter" class="welcome-hotspot welcome-enter" type="button" aria-label="Entrar no aplicativo"></button>
+        <button id="welcomeChangeUser" class="welcome-hotspot welcome-change-user" type="button" aria-label="Trocar usuário"></button>
+      </div>
+    </section>
+
+    <section id="loginScreen" class="screen">
+      <div class="brand-card">
+        <div class="brand-mark">H</div>
+        <h1>Transporte HEURO</h1>
+        <p>Acesso ao sistema</p>
+      </div>
+
+      <form id="loginForm" class="card form-card">
+        <label for="userName">Nome de usuário</label>
+        <input id="userName" type="text" autocomplete="username" required />
+
+        <label for="password">Senha</label>
+        <input id="password" type="password" autocomplete="current-password" required />
+
+        <label class="checkbox-row">
+          <input id="rememberUser" type="checkbox" checked />
+          <span>Lembrar usuário neste aparelho</span>
+        </label>
+
+        <button class="primary-button" type="submit">Entrar</button>
+        <button id="openRegister" class="link-button" type="button">Realizar primeiro cadastro</button>
+        <p id="loginMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="registerScreen" class="screen">
+      <div class="section-head page-head">
+        <div>
+          <span class="eyebrow dark">Primeiro acesso — Etapa 1</span>
+          <h2>Escolha o tipo de cadastro</h2>
+          <p>Selecione uma opção para continuar.</p>
+        </div>
+        <button id="registerBack" class="back-button" type="button">Voltar</button>
+      </div>
+
+      <div class="card form-card">
+        <fieldset class="profile-options">
+          <legend>Tipo de acesso solicitado</legend>
+
+          <label class="profile-option">
+            <input type="radio" name="profileChoice" value="solicitante" />
+            <span>
+              <strong>Solicitante de transporte</strong>
+              <small>Profissional que realiza pedidos de transporte.</small>
+            </span>
+          </label>
+
+          <label class="profile-option">
+            <input type="radio" name="profileChoice" value="transporte" />
+            <span>
+              <strong>Executante de transporte</strong>
+              <small>Profissional que recebe e executa os transportes.</small>
+            </span>
+          </label>
+
+          <label class="profile-option">
+            <input type="radio" name="profileChoice" value="administrador" />
+            <span>
+              <strong>Administrador</strong>
+              <small>Acesso administrativo sujeito à autorização de outro administrador.</small>
+            </span>
+          </label>
+        </fieldset>
+
+        <button id="continueRegister" class="primary-button" type="button">Continuar</button>
+        <p id="profileChoiceMessage" class="form-message" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="registerDetailsScreen" class="screen">
+      <div class="section-head page-head">
+        <div>
+          <span class="eyebrow dark">Primeiro acesso — Etapa 2</span>
+          <h2>Realizar cadastro</h2>
+          <p id="selectedProfileText">Preencha seus dados.</p>
+        </div>
+        <button id="registerDetailsBack" class="back-button" type="button">Voltar</button>
+      </div>
+
+      <form id="registerForm" class="card form-card">
+        <div hidden>
+          <label><input type="radio" name="registerProfile" value="solicitante" /></label>
+          <label><input type="radio" name="registerProfile" value="transporte" /></label>
+          <label><input type="radio" name="registerProfile" value="administrador" /></label>
+        </div>
+
+        <p class="admin-access-note">
+          <strong>Perfil escolhido:</strong>
+          <span id="selectedProfileLabel">Não selecionado</span>.
+          O acesso somente será liberado após autorização de um administrador.
+        </p>
+
+        <label for="fullName">Nome completo</label>
+        <input id="fullName" type="text" autocomplete="name" required />
+
+        <label for="cpf">CPF</label>
+        <input id="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
+
+        <label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="email" required />
+
+        <label for="phone">Telefone/WhatsApp</label>
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" required />
+
+        <label for="newUserName">Nome de usuário</label>
+        <input id="newUserName" type="text" autocomplete="username" minlength="3" required />
+
+        <label for="newPassword">Senha</label>
+        <input id="newPassword" type="password" autocomplete="new-password" minlength="6" required />
+
+        <label for="confirmPassword">Confirmar senha</label>
+        <input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required />
+
+        <label class="checkbox-row declaration">
+          <input id="truthDeclaration" type="checkbox" required />
+          <span>Declaro que as informações fornecidas são verdadeiras e estou ciente de que o acesso depende da autorização de um administrador.</span>
+        </label>
+
+        <button class="primary-button" type="submit">Enviar cadastro para aprovação</button>
+        <p id="registerMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="homeScreen" class="screen">
+      <!-- Mantido para compatibilidade com app.js; fica oculto na nova página de comando. -->
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">Transporte HEURO</span>
+          <h2 id="welcomeName">Olá</h2>
+          <p id="welcomeRole"></p>
+        </div>
+        <button id="logoutButton" class="text-button" type="button">Sair</button>
+      </header>
+
+      <!-- NOVO DASHBOARD DIRETO NO HTML -->
+      <div id="dashboard" class="command-image-dashboard">
+        <div class="command-image-frame" aria-label="Página de comando do Transporte HEURO">
+          <img
+            class="command-image"
+            src="05394C12-F4A3-417B-9B83-534F29C9A87D.png?v=20260731-v2"
+            alt="Página de comando do aplicativo Transporte HEURO"
+            decoding="async"
+            fetchpriority="high"
+          />
+
+          <button id="commandBell" class="command-hotspot hotspot-bell" type="button" aria-label="Abrir notificações"></button>
+          <button id="commandLogout" class="command-hotspot hotspot-logout" type="button" aria-label="Sair do aplicativo"></button>
+
+          <button id="newRequestCard" class="command-hotspot hotspot-new-request" data-view="request" type="button" aria-label="Nova solicitação de transporte"></button>
+          <button id="teamTransportCard" class="command-hotspot hotspot-team" data-view="list" type="button" aria-label="Transportes da equipe"></button>
+          <button id="pendingRequestsCard" class="command-hotspot hotspot-pending" data-view="list" type="button" aria-label="Solicitações pendentes"></button>
+          <button id="agendaCard" class="command-hotspot hotspot-agenda" data-view="list" type="button" aria-label="Agenda de transportes"></button>
+          <button id="historyCard" class="command-hotspot hotspot-history" data-view="list" type="button" aria-label="Histórico de transportes"></button>
+
+          <button id="homeNavCard" class="command-hotspot hotspot-home" type="button" aria-label="Início"></button>
+          <button id="transportNavCard" class="command-hotspot hotspot-transport" data-view="list" type="button" aria-label="Transportes"></button>
+          <button id="notificationsNavCard" class="command-hotspot hotspot-notifications" data-view="list" type="button" aria-label="Notificações"></button>
+          <button id="profileNavCard" class="command-hotspot hotspot-profile" type="button" aria-label="Perfil"></button>
+          <button id="moreNavCard" class="command-hotspot hotspot-more" type="button" aria-label="Mais opções"></button>
+
+          <!-- Elementos exigidos pelo app.js; permanecem invisíveis. -->
+          <button id="usersCard" class="command-system-control hidden" data-view="users" type="button" aria-label="Autorizar usuários"></button>
+          <button id="settingsCard" class="command-system-control hidden" data-view="settings" type="button" aria-label="Configurações"></button>
+          <span id="pendingBadge" class="hidden">0</span>
+        </div>
+      </div>
+
+      <section id="requestView" class="card content-view hidden">
+        <div class="section-head">
+          <div><span class="eyebrow dark">Solicitação</span><h3>Nova solicitação</h3></div>
+          <button class="back-button" data-back type="button">Voltar</button>
+        </div>
+
+        <form id="requestForm" class="request-form">
+          <div class="form-grid">
+            <label>Nome do paciente<input id="patient" required /></label>
+            <label>Data de nascimento<input id="birthDate" type="date" /></label>
+
+            <label>
+              Setor de origem
+              <select id="originSector" required>
+                <option value="">Selecione o setor</option>
+                <option>Sala Vermelha</option>
+                <option>Clínica Médica</option>
+                <option>Clínica Cirúrgica/Ortopédica</option>
+                <option>Clínica Geral</option>
+                <option>UTI</option>
+                <option>Centro Cirúrgico</option>
+              </select>
+            </label>
+
+            <div id="boxLocation" class="location-group hidden">
+              <span class="group-label">Local de origem</span>
+              <div class="location-fields single-field">
+                <label>Box<input id="boxNumber" inputmode="numeric" placeholder="Ex.: 03" /></label>
+              </div>
+            </div>
+
+            <div id="wardLocation" class="location-group">
+              <span class="group-label">Local de origem</span>
+              <div class="location-fields">
+                <label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label>
+                <label>Leito<input id="bed" placeholder="Ex.: 08" /></label>
+              </div>
+            </div>
+
+            <label>Unidade de destino<input id="destination" required /></label>
+            <label>Data do transporte<input id="transportDate" type="date" required /></label>
+            <label>Horário previsto<input id="transportTime" type="time" required /></label>
+
+            <label>
+              Tipo de ambulância
+              <select id="ambulanceType">
+                <option>Suporte básico</option>
+                <option>UTI</option>
+              </select>
+            </label>
+
+            <label>
+              Prioridade
+              <select id="priority">
+                <option>Programado</option>
+                <option>Urgente</option>
+                <option>Emergência</option>
+              </select>
+            </label>
+
+            <label>
+              Oxigênio
+              <select id="oxygen">
+                <option>Não</option>
+                <option>Sim</option>
+              </select>
+            </label>
+          </div>
+
+          <label>Contato do setor solicitante<input id="contact" inputmode="tel" /></label>
+          <label>Observações<textarea id="notes" rows="4"></textarea></label>
+
+          <label>
+            Documento da regulação
+            <input id="attachment" type="file" accept=".pdf,image/*" />
+            <small class="help">Nesta etapa, apenas o nome do documento fica registrado neste aparelho.</small>
+          </label>
+
+          <div class="action-row">
+            <button class="primary-button" type="submit">Salvar solicitação</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="listView" class="content-view hidden">
+        <div class="section-head">
+          <div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div>
+          <button class="back-button" data-back type="button">Voltar</button>
+        </div>
+        <div id="requestList" class="request-list"></div>
+      </section>
+
+      <section id="usersView" class="content-view hidden">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow dark">Administração</span>
+            <h3>Autorizar usuários</h3>
+            <p>Autorize os cadastros enviados para aprovação.</p>
+          </div>
+          <button class="back-button" data-back type="button">Voltar</button>
+        </div>
+        <div id="userApprovalList" class="request-list"></div>
+      </section>
+
+      <section id="settingsView" class="card content-view hidden">
+        <div class="section-head">
+          <div><span class="eyebrow dark">Configuração administrativa</span><h3>Números do transporte</h3></div>
+          <button class="back-button" data-back type="button">Voltar</button>
+        </div>
+
+        <form id="settingsForm" class="request-form">
+          <label>
+            WhatsApp — Transporte básico
+            <input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" required />
+          </label>
+          <p class="help">Informe somente números com DDD. O sistema adiciona o código do Brasil automaticamente.</p>
+          <button class="primary-button" type="submit">Salvar números</button>
+        </form>
+      </section>
+
+      <section id="detailView" class="card content-view hidden">
+        <div id="detailContent"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js?v=15"></script>
+  <script src="register-flow.js?v=15"></script>
+  <script src="whatsapp-routing.js?v=3"></script>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const byId = (id) => document.getElementById(id);
+
+      byId('commandLogout')?.addEventListener('click', () => {
+        byId('logoutButton')?.click();
+      });
+
+      byId('commandBell')?.addEventListener('click', () => {
+        byId('notificationsNavCard')?.click();
+      });
+
+      byId('homeNavCard')?.addEventListener('click', () => {
+        document.querySelectorAll('#homeScreen > .content-view').forEach((view) => view.classList.add('hidden'));
+        byId('dashboard')?.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      });
+
+      byId('profileNavCard')?.addEventListener('click', () => {
+        let active = null;
+        try {
+          active = JSON.parse(sessionStorage.getItem('heuroSession') || 'null');
+        } catch (_) {}
+
+        if (active) {
+          const labels = {
+            solicitante: 'Solicitante de transporte',
+            transporte: 'Executante de transporte',
+            administrador: 'Administrador'
+          };
+          alert(`${active.name}\n${labels[active.profile] || active.profile}`);
+        } else {
+          alert('Perfil do usuário');
+        }
+      });
+
+      byId('moreNavCard')?.addEventListener('click', () => {
+        let active = null;
+        try {
+          active = JSON.parse(sessionStorage.getItem('heuroSession') || 'null');
+        } catch (_) {}
+
+        if (active?.profile === 'administrador') {
+          byId('usersCard')?.click();
+        } else {
+          alert('Esta área é exclusiva para administradores.');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
