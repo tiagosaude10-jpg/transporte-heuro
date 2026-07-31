@@ -1,7 +1,7 @@
 (()=>{
   'use strict';
   const $=id=>document.getElementById(id);
-  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[ch]));
   const normalize=value=>String(value||'').trim().toLowerCase();
   const labels={solicitante:'Solicitante de transporte',transporte:'Executante de transporte',administrador:'Administrador'};
   const statusLabels={aguardando:'Aguardando autorização',ativo:'Ativo',recusado:'Recusado',bloqueado:'Bloqueado',inativo:'Inativo'};
@@ -15,13 +15,16 @@
     if($('adminNewStyles'))return;
     const style=document.createElement('style');style.id='adminNewStyles';style.textContent=`
       .admin-page{max-width:760px;margin:0 auto;padding:20px 14px 42px}
-      .admin-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px}
-      .admin-head span{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0b5fa5}.admin-head h2{margin:4px 0 0}
-      .admin-back{border:0;border-radius:11px;padding:10px 14px;background:#e8eef7;color:#13213a;font-weight:700}
-      .admin-list{display:grid;gap:14px}.admin-card{background:#fff;border:1px solid #dce4ef;border-radius:18px;padding:18px;box-shadow:0 8px 22px rgba(20,40,80,.08)}
+      .admin-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:18px}
+      .admin-head span{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0b5fa5}.admin-head h2{margin:4px 0 0;line-height:1.12}
+      .admin-back{border:0;border-radius:18px;padding:13px 18px;background:#e8eef7;color:#13213a;font-weight:800;min-width:104px;box-shadow:0 4px 12px rgba(20,40,80,.06)}
+      .admin-list{display:grid;gap:16px}.admin-card{background:#fff;border:1px solid #dce4ef;border-radius:24px;padding:20px;box-shadow:0 10px 26px rgba(20,40,80,.08)}
       .admin-card h3{margin:10px 0 5px}.admin-card small{color:#657389}.admin-data{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.admin-data span{background:#f5f8fc;border-radius:12px;padding:10px;color:#4f5f76}.admin-data b{display:block;color:#13213a;margin-bottom:3px}
-      .admin-card select,.admin-card input{width:100%;padding:12px;border:1px solid #ccd5e2;border-radius:12px;background:#fff}.admin-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.admin-actions button{border:0;border-radius:11px;padding:11px 14px;font-weight:800}.admin-approve{background:#dff6e8;color:#08743a}.admin-reject{background:#ffe5e5;color:#a51f1f}.admin-block{background:#eef2f7;color:#37465d}.admin-save{width:100%;background:#0b5fa5;color:#fff}.admin-status{display:inline-flex;padding:6px 9px;border-radius:999px;background:#fff0d9;color:#a65a00;font-size:12px;font-weight:800}.admin-status.ativo{background:#dcf7e8;color:#08743a}.admin-status.recusado,.admin-status.bloqueado{background:#ffe4e4;color:#a51f1f}.admin-empty{text-align:center;padding:24px;background:#fff;border:1px solid #dce4ef;border-radius:18px;color:#657389}.admin-help{color:#657389;line-height:1.45;margin:8px 0 14px}.admin-message{min-height:22px;margin-top:10px;font-weight:700;color:#08743a}
-      @media(max-width:600px){.admin-data{grid-template-columns:1fr}}
+      .admin-card label{margin-top:17px;font-weight:800;color:#13213a}.admin-card select,.admin-card input{width:100%;min-height:56px;padding:14px 16px;border:1px solid #cbd6e5;border-radius:18px;background:#fff;font-size:18px;outline:none}.admin-card input:focus,.admin-card select:focus{border-color:#0b5fa5;box-shadow:0 0 0 4px rgba(11,95,165,.10)}
+      .admin-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.admin-actions button{border:0;border-radius:14px;padding:12px 15px;font-weight:800}.admin-approve{background:#dff6e8;color:#08743a}.admin-reject{background:#ffe5e5;color:#a51f1f}.admin-block{background:#eef2f7;color:#37465d}
+      .admin-save{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin-top:22px;border:0;border-radius:18px;background:#0b5fa5;color:#fff;font-size:18px;font-weight:800;box-shadow:0 8px 18px rgba(11,95,165,.22)}.admin-save:active{transform:scale(.99)}
+      .admin-status{display:inline-flex;padding:6px 9px;border-radius:999px;background:#fff0d9;color:#a65a00;font-size:12px;font-weight:800}.admin-status.ativo{background:#dcf7e8;color:#08743a}.admin-status.recusado,.admin-status.bloqueado{background:#ffe4e4;color:#a51f1f}.admin-empty{text-align:center;padding:24px;background:#fff;border:1px solid #dce4ef;border-radius:18px;color:#657389}.admin-help{color:#657389;line-height:1.45;margin:10px 0 18px;font-size:15px}.admin-message{display:none;margin-top:16px;padding:13px 15px;border-radius:14px;background:#e8f8ee;color:#08743a;font-weight:800;line-height:1.35}.admin-message:not(:empty){display:block}
+      @media(max-width:600px){.admin-data{grid-template-columns:1fr}.admin-page{padding-left:18px;padding-right:18px}.admin-head h2{font-size:31px}.admin-card{padding:18px}.admin-back{min-width:96px;padding:12px 15px}}
     `;document.head.appendChild(style);
   }
 
@@ -53,7 +56,7 @@
   function renderWhatsapp(){
     injectStyles();const active=session();if(active?.profile!=='administrador'){alert('Área exclusiva para administradores.');return}
     const screen=ensureScreen('whatsappAdminNew','Configurar WhatsApp da empresa','Administração');const list=screen.querySelector('.admin-list');
-    list.innerHTML=`<form id="whatsappAdminForm" class="admin-card"><label>WhatsApp — Transporte básico<input id="whatsappBasicNew" inputmode="numeric" placeholder="Ex.: 69999999999" value="${esc(localStorage.getItem('heuroWhatsapp')||'')}"></label><p class="admin-help">Informe somente números com DDD. O sistema acrescentará o código do Brasil quando necessário.</p><label>WhatsApp — Transporte UTI<input id="whatsappUtiNew" inputmode="numeric" placeholder="Ex.: 69999999999" value="${esc(localStorage.getItem('heuroWhatsappUti')||'')}"></label><button class="admin-actions admin-save" type="submit">Salvar números</button><p id="whatsappAdminMessage" class="admin-message"></p></form>`;
+    list.innerHTML=`<form id="whatsappAdminForm" class="admin-card"><label>WhatsApp — Transporte básico<input id="whatsappBasicNew" inputmode="numeric" placeholder="Ex.: 69999999999" value="${esc(localStorage.getItem('heuroWhatsapp')||'')}"></label><p class="admin-help">Informe somente números com DDD. O sistema acrescentará o código do Brasil quando necessário.</p><label>WhatsApp — Transporte UTI<input id="whatsappUtiNew" inputmode="numeric" placeholder="Ex.: 69999999999" value="${esc(localStorage.getItem('heuroWhatsappUti')||'')}"></label><button class="admin-save" type="submit">Salvar números</button><p id="whatsappAdminMessage" class="admin-message"></p></form>`;
     list.querySelector('#whatsappAdminForm')?.addEventListener('submit',event=>{event.preventDefault();localStorage.setItem('heuroWhatsapp',$('whatsappBasicNew').value.replace(/\D/g,''));localStorage.setItem('heuroWhatsappUti',$('whatsappUtiNew').value.replace(/\D/g,''));$('whatsappAdminMessage').textContent='Números salvos com sucesso neste aparelho.';});show('whatsappAdminNew');
   }
 
