@@ -93,8 +93,7 @@
 
       <div id="dashboard" class="command-image-dashboard">
         <div class="command-image-frame" aria-label="Página de comando do Transporte HEURO">
-          <img class="command-image" src="05394C12-F4A3-417B-9B83-534F29C9A87D.png?v=20260731-1740" alt="Página de comando do aplicativo Transporte HEURO" decoding="async" fetchpriority="high" />
-
+          <img class="command-image" src="05394C12-F4A3-417B-9B83-534F29C9A87D.png?v=20260731-1752" alt="Página de comando do aplicativo Transporte HEURO" decoding="async" fetchpriority="high" />
           <button id="v2Bell" class="command-hotspot hotspot-bell" type="button" aria-label="Abrir notificações"></button>
           <button id="v2Logout" class="command-hotspot hotspot-logout" type="button" aria-label="Sair do aplicativo"></button>
           <button id="v2NewRequest" class="command-hotspot hotspot-new-request" type="button" aria-label="Nova solicitação de transporte"></button>
@@ -107,7 +106,6 @@
           <button id="v2Notifications" class="command-hotspot hotspot-notifications" type="button" aria-label="Notificações"></button>
           <button id="v2Profile" class="command-hotspot hotspot-profile" type="button" aria-label="Perfil"></button>
           <button id="v2More" class="command-hotspot hotspot-more" type="button" aria-label="Mais opções"></button>
-
           <button id="newRequestCard" class="command-system-control hidden" data-view="request" type="button" tabindex="-1" aria-hidden="true"></button>
           <button id="v2ListBridge" class="command-system-control hidden" data-view="list" type="button" tabindex="-1" aria-hidden="true"></button>
           <button id="usersCard" class="command-system-control hidden" data-view="users" type="button" tabindex="-1" aria-hidden="true"></button>
@@ -124,19 +122,32 @@
     </section>
   </main>
 
-  <script src="app.js?v=15"></script>
+  <script>
+    (() => {
+      if (!('serviceWorker' in navigator)) return;
+      const sw = navigator.serviceWorker;
+      try {
+        Object.defineProperty(sw, 'register', {
+          configurable: true,
+          value: () => Promise.resolve({ scope: location.origin + '/transporte-heuro/' })
+        });
+      } catch (_) {}
+      sw.getRegistrations().then((regs) => Promise.all(regs.map((reg) => reg.unregister()))).catch(() => {});
+      if ('caches' in window) caches.keys().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {});
+    })();
+  </script>
+  <script src="app.js?v=16"></script>
   <script src="register-flow.js?v=15"></script>
   <script src="whatsapp-routing.js?v=3"></script>
   <script>
     (()=>{
       const byId=(id)=>document.getElementById(id); const click=(id)=>byId(id)?.click();
-      if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});}
       byId('v2NewRequest')?.addEventListener('click',()=>click('newRequestCard'));
       ['v2TeamTransport','v2Pending','v2Agenda','v2History','v2Bell','v2Transport','v2Notifications'].forEach(id=>byId(id)?.addEventListener('click',()=>click('v2ListBridge')));
       byId('v2Logout')?.addEventListener('click',()=>click('logoutButton'));
       byId('v2Home')?.addEventListener('click',()=>{document.querySelectorAll('#homeScreen > .content-view').forEach(v=>v.classList.add('hidden'));byId('dashboard')?.classList.remove('hidden');window.scrollTo(0,0);});
-      byId('v2Profile')?.addEventListener('click',()=>{let a=null;try{a=JSON.parse(sessionStorage.getItem('heuroSession')||'null')}catch{};const l={solicitante:'Solicitante de transporte',transporte:'Executante de transporte',administrador:'Administrador'};alert(a?`${a.name}\n${l[a.profile]||a.profile}`:'Perfil do usuário');});
-      byId('v2More')?.addEventListener('click',()=>{let a=null;try{a=JSON.parse(sessionStorage.getItem('heuroSession')||'null')}catch{};if(a?.profile==='administrador')click('usersCard');else alert('Esta área é exclusiva para administradores.');});
+      byId('v2Profile')?.addEventListener('click',()=>{let a=null;try{a=JSON.parse(sessionStorage.getItem('heuroSession')||'null')}catch(_){};alert(a?`${a.name}\n${a.profile}`:'Perfil do usuário');});
+      byId('v2More')?.addEventListener('click',()=>{let a=null;try{a=JSON.parse(sessionStorage.getItem('heuroSession')||'null')}catch(_){};if(a?.profile==='administrador')click('usersCard');else alert('Esta área é exclusiva para administradores.');});
     })();
   </script>
 </body>
