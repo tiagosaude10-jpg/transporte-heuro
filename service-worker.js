@@ -1,5 +1,5 @@
-const CACHE_NAME='transporte-heuro-v20';
-const APP_FILES=['./','./index.html','./style.css?v=14','./app.js?v=14','./register-flow.js?v=14','./whatsapp-routing.js?v=2','./home-layout-fix.js?v=1','./manifest.json','./IMG_1774.webp'];
+const CACHE_NAME='transporte-heuro-v21';
+const APP_FILES=['./','./index.html','./style.css?v=14','./app.js?v=14','./register-flow.js?v=14','./whatsapp-routing.js?v=2','./home-layout-fix.js?v=1','./manifest.json','./IMG_1774.webp','./AC1F8155-6FA3-4763-B069-50086DF91DD6.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_FILES)));self.skipWaiting();});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))));self.clients.claim();});
 self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{const copy=response.clone();caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));return response;}).catch(()=>caches.match(event.request)));});
