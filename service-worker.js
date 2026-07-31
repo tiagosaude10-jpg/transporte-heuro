@@ -1,4 +1,4 @@
-const CACHE_NAME='transporte-heuro-v22';
+const CACHE_NAME='transporte-heuro-v23';
 const APP_FILES=[
   './',
   './index.html',
@@ -9,7 +9,7 @@ const APP_FILES=[
   './home-layout-fix.js?v=3',
   './manifest.json',
   './IMG_1774.webp',
-  './05394C12-F4A3-417B-9B83-534F29C9A87D.png'
+  './05394C12-F4A3-417B-9B83-534F29C9A87D.png?v=20260731-4'
 ];
 
 self.addEventListener('install',event=>{
@@ -29,8 +29,10 @@ self.addEventListener('fetch',event=>{
   event.respondWith(
     fetch(event.request,{cache:'no-store'})
       .then(response=>{
-        const copy=response.clone();
-        caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));
+        if(response && response.ok){
+          const copy=response.clone();
+          caches.open(CACHE_NAME).then(cache=>cache.put(event.request,copy));
+        }
         return response;
       })
       .catch(()=>caches.match(event.request))
