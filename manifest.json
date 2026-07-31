@@ -4,8 +4,22 @@
   "description": "Aplicativo de agendamento de transporte do HEURO",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#f4f7fa",
-  "theme_color": "#0b5fa5",
+  "background_color": "#071b4d",
+  "theme_color": "#071b4d",
   "lang": "pt-BR",
-  "orientation": "portrait-primary"
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "AC1F8155-6FA3-4763-B069-50086DF91DD6.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "AC1F8155-6FA3-4763-B069-50086DF91DD6.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }
