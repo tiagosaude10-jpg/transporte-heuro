@@ -1,4 +1,12 @@
 (() => {
+  // Substitui a arte da tela inicial pela versão WebP otimizada.
+  const welcomeImage = document.querySelector('.welcome-image');
+  if (welcomeImage) {
+    welcomeImage.src = 'IMG_1774.webp';
+    welcomeImage.decoding = 'async';
+    welcomeImage.fetchPriority = 'high';
+  }
+
   function applyHomeLayout() {
     const dashboard = document.getElementById('dashboard');
     if (!dashboard) return;
