@@ -1,4 +1,4 @@
-const CACHE_NAME='transporte-heuro-v18';
+const CACHE_NAME='transporte-heuro-v19';
 const APP_FILES=['./','./index.html','./style.css?v=14','./app.js?v=14','./register-flow.js?v=14','./whatsapp-routing.js?v=2','./home-layout-fix.js?v=1','./manifest.json','./B7CD7159-F46C-4493-81F4-B566F4896F87.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(APP_FILES)));self.skipWaiting();});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE_NAME).map(key=>caches.delete(key)))));self.clients.claim();});
