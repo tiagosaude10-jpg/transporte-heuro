@@ -1,0 +1,26 @@
+{
+  "name": "Transporte HEURO",
+  "short_name": "HEURO Transporte",
+  "description": "Aplicativo de solicitação e acompanhamento de transporte do HEURO",
+  "start_url": "./index-novo.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#071b4d",
+  "theme_color": "#071b4d",
+  "lang": "pt-BR",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "AC1F8155-6FA3-4763-B069-50086DF91DD6.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "AC1F8155-6FA3-4763-B069-50086DF91DD6.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
