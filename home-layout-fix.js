@@ -50,6 +50,43 @@
       right:12px;
       transform:translateY(-50%);
     }
+
+    #welcomeScreen.welcome-screen.active{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100dvh;
+      min-height:0;
+      padding:0!important;
+      overflow:hidden!important;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+      z-index:9999;
+    }
+    #welcomeScreen .welcome-frame{
+      position:relative;
+      width:min(100%,620px);
+      height:100%;
+      min-height:0;
+      overflow:hidden;
+      background:#fff;
+    }
+    #welcomeScreen .welcome-image{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center center;
+      background:#fff;
+    }
+    html:has(#welcomeScreen.active),
+    body:has(#welcomeScreen.active){
+      height:100%;
+      overflow:hidden!important;
+      overscroll-behavior:none;
+    }
   `;
   document.head.appendChild(style);
 
