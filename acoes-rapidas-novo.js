@@ -8,6 +8,7 @@
   const formatDate=value=>{if(!value)return 'Não informado';const [y,m,d]=value.split('-');return y&&m&&d?`${d}/${m}/${y}`:value};
   const normalize=value=>String(value||'').trim().toLowerCase();
   const isDone=item=>['concluído','concluido','cancelado'].includes(normalize(item.status));
+  const isAccepted=item=>normalize(item.status)==='aceito';
   const show=id=>{document.querySelectorAll('.screen').forEach(screen=>screen.classList.remove('active'));$(id)?.classList.add('active');window.scrollTo(0,0)};
 
   function injectStyles(){
@@ -21,19 +22,24 @@
       .quick-head h2{margin:4px 0 0}
       .quick-back{border:0;border-radius:11px;padding:10px 14px;background:#e8eef7;color:#13213a;font-weight:700}
       .quick-list{display:grid;gap:12px}
-      .quick-card{width:100%;text-align:left;border:1px solid #dce4ef;border-radius:17px;background:#fff;padding:16px;box-shadow:0 8px 22px rgba(20,40,80,.08)}
+      .quick-card{width:100%;text-align:left;border:1px solid #dce4ef;border-radius:17px;background:#fff;padding:16px;box-shadow:0 8px 22px rgba(20,40,80,.08);box-sizing:border-box}
+      button.quick-card{appearance:none;font:inherit;cursor:pointer}
+      .quick-card:active{transform:scale(.992)}
       .quick-card strong{display:block;font-size:17px;margin:7px 0 5px;color:#13213a}
       .quick-card small,.quick-card span{display:block;color:#5f6d82;line-height:1.42}
       .quick-status{display:inline-block!important;width:auto;padding:5px 9px;border-radius:999px;background:#fff0d9;color:#a65a00!important;font-weight:800;font-size:12px}
-      .quick-status.done{background:#dcf7e8;color:#08743a!important}
+      .quick-status.accepted{background:#dcf7e8;color:#08743a!important}
+      .quick-status.done{background:#e9def6;color:#5b3f82!important}
+      .quick-person{margin-top:6px;font-size:13px;color:#46566d!important}
+      .quick-person b{color:#243b64}
+      .pending-sheet-button{width:100%;border:0;border-radius:14px;padding:14px 16px;background:linear-gradient(135deg,#0b6fc1,#084f9b);color:#fff;font-weight:900;font-size:15px;box-shadow:0 8px 18px rgba(8,79,155,.20);margin-bottom:4px}
       .quick-empty{background:#fff;border-radius:17px;padding:22px;text-align:center;color:#657389;border:1px solid #dce4ef}
       .profile-card,.more-card{background:#fff;border:1px solid #dce4ef;border-radius:18px;padding:20px;box-shadow:0 8px 22px rgba(20,40,80,.08)}
       .profile-card p{margin:8px 0;color:#5f6d82}.profile-card b{color:#13213a}
       .more-grid{display:grid;gap:12px}.more-action{width:100%;border:0;border-radius:14px;padding:15px;text-align:left;background:#eef5fb;color:#0b5fa5;font-weight:800}
       .notice{background:#fff;border-left:5px solid #0b5fa5;border-radius:14px;padding:15px;box-shadow:0 7px 18px rgba(20,40,80,.07)}
       .notice strong{display:block;margin-bottom:5px}.notice small{color:#66758a}
-
-      #pendingNew.active{position:fixed;inset:0;overflow:hidden;background:#fff;padding-top:env(safe-area-inset-top,0px)}
+      #pendingNew.active{position:fixed;inset:0;overflow:hidden;background:#f5f8fc;padding-top:env(safe-area-inset-top,0px)}
       #pendingNew.active .quick-page{height:100%;max-width:760px;margin:0 auto;padding:18px 14px 0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
       #pendingNew.active .quick-head{flex:0 0 auto;margin:0 -14px;padding:0 14px 16px;background:#fff;border-bottom:1px solid #edf1f6;box-shadow:0 6px 14px rgba(20,40,80,.06);z-index:5}
       #pendingNew.active .quick-list{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 0 36px;overscroll-behavior:contain}
@@ -53,18 +59,36 @@
     return screen;
   }
 
-  function card(item){
-    const location=item.boxNumber?`Box ${esc(item.boxNumber)}`:`Enfermaria ${esc(item.ward||'não informada')} · Leito ${esc(item.bed||'não informado')}`;
-    return `<article class="quick-card"><span class="quick-status ${isDone(item)?'done':''}">${esc(item.status||'Solicitado')}</span><strong>${esc(item.patient||'Paciente não informado')}</strong><small>${esc(item.protocol||'Sem protocolo')}</small><span>${esc(item.originSector||'Origem não informada')} · ${location}</span><span>Destino: ${esc(item.destination||'Não informado')}</span><span>${formatDate(item.transportDate)} às ${esc(item.transportTime||'--:--')}</span></article>`;
+  function openPendingSheet(){
+    const teamButton=$('cmdTeam');
+    if(!teamButton)return;
+    teamButton.click();
+    let attempts=0;
+    const tryOpen=()=>{
+      const pendingButton=$('openPendingTeam');
+      if(pendingButton){pendingButton.click();return}
+      if(++attempts<12)setTimeout(tryOpen,80);
+    };
+    setTimeout(tryOpen,80);
   }
 
-  function render(screenId,title,eyebrow,filter,sorter,emptyText){
+  function card(item,clickable=false){
+    const location=item.boxNumber?`Box ${esc(item.boxNumber)}`:`Enfermaria ${esc(item.ward||'não informada')} · Leito ${esc(item.bed||'não informado')}`;
+    const status=isAccepted(item)?'Aceito / Em andamento':(item.status||'Solicitado');
+    const statusClass=isDone(item)?'done':(isAccepted(item)?'accepted':'');
+    const tag=clickable?'button':'article';
+    const attrs=clickable?`type="button" data-open-pending-sheet="1" data-request-id="${esc(item.id)}"`:'';
+    return `<${tag} class="quick-card" ${attrs}><span class="quick-status ${statusClass}">${esc(status)}</span><strong>${esc(item.patient||'Paciente não informado')}</strong><small>${esc(item.protocol||'Sem protocolo')}</small><span>${esc(item.originSector||'Origem não informada')} · ${location}</span><span>Destino: ${esc(item.destination||'Não informado')}</span><span>Horário agendado: ${formatDate(item.transportDate)} às ${esc(item.transportTime||'--:--')}</span><span class="quick-person"><b>Solicitado por:</b> ${esc(item.requester||'Não informado')}</span><span class="quick-person"><b>Aceito por:</b> ${esc(item.executor||'—')}</span></${tag}>`;
+  }
+
+  function render(screenId,title,eyebrow,filter,sorter,emptyText,options={}){
     injectStyles();
     const screen=ensureScreen(screenId,title,eyebrow);
     const list=screen.querySelector('.quick-list');
     let data=readRequests().filter(filter);
     if(sorter)data=data.sort(sorter);
-    list.innerHTML=data.length?data.map(card).join(''):`<div class="quick-empty">${esc(emptyText)}</div>`;
+    const top=options.pending?'<button class="pending-sheet-button" data-open-pending-sheet="1" type="button">Visualizar planilha geral de pendências</button>':'';
+    list.innerHTML=top+(data.length?data.map(item=>card(item,Boolean(options.pending))).join(''):`<div class="quick-empty">${esc(emptyText)}</div>`);
     list.scrollTop=0;
     show(screenId);
   }
@@ -79,7 +103,15 @@
     },true);
   }
 
-  bind('cmdPending',()=>render('pendingNew','Solicitações pendentes','Ações rápidas',item=>!isDone(item),(a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0),'Nenhuma solicitação pendente no momento.'));
+  document.addEventListener('click',event=>{
+    const target=event.target.closest('[data-open-pending-sheet="1"]');
+    if(!target)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    openPendingSheet();
+  },true);
+
+  bind('cmdPending',()=>render('pendingNew','Solicitações pendentes','Ações rápidas',item=>!isDone(item),(a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0),'Nenhuma solicitação pendente no momento.',{pending:true}));
   bind('cmdAgenda',()=>render('agendaNew','Agenda de transportes','Programação',item=>!isDone(item)&&Boolean(item.transportDate),(a,b)=>`${a.transportDate||''}T${a.transportTime||''}`.localeCompare(`${b.transportDate||''}T${b.transportTime||''}`),'Nenhum transporte programado na agenda.'));
   bind('cmdHistory',()=>render('historyNew','Histórico de transportes','Consultas',item=>isDone(item),(a,b)=>new Date(b.completedAt||b.createdAt||0)-new Date(a.completedAt||a.createdAt||0),'Nenhum transporte concluído no histórico.'));
   bind('cmdHome',()=>show('commandNew'));
