@@ -24,10 +24,7 @@ html,body{max-width:100%!important;overflow-x:hidden!important}
 }
 function goToTeamMenu(){
   const commandButton=document.getElementById('cmdTeam');
-  if(commandButton){
-    commandButton.click();
-    setTimeout(()=>window.scrollTo(0,0),80);
-  }
+  if(commandButton){commandButton.click();setTimeout(()=>window.scrollTo(0,0),80)}
 }
 function bindLayout(){
   installStyles();
@@ -38,11 +35,17 @@ new MutationObserver(bindLayout).observe(document.documentElement,{subtree:true,
 document.addEventListener('click',event=>{
   const internalBack=event.target.closest('#backAcceptedMenu,#backTeamMenu');
   if(!internalBack)return;
-  event.preventDefault();
-  event.stopPropagation();
-  event.stopImmediatePropagation();
-  goToTeamMenu();
+  event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();goToTeamMenu();
 },true);
 window.addEventListener('pageshow',bindLayout);
 bindLayout();
+
+// Carrega a planilha geral exclusiva das pendências sem reutilizar a planilha antiga da equipe.
+if(!document.getElementById('planilhaPendenciasGeralScript')){
+  const script=document.createElement('script');
+  script.id='planilhaPendenciasGeralScript';
+  script.src=`planilha-pendencias-geral.js?v=1-${Date.now()}`;
+  script.async=false;
+  document.body.appendChild(script);
+}
 })();
