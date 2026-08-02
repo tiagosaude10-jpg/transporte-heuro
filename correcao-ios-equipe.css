@@ -1,0 +1,14 @@
+/* Corrige a área segura do iPhone sem alterar a rolagem independente das tabelas. */
+#teamNew.active{
+  top:calc(env(safe-area-inset-top, 0px) + 14px)!important;
+  bottom:env(safe-area-inset-bottom, 0px)!important;
+  height:auto!important;
+  min-height:0!important;
+}
+
+@media (display-mode:standalone){
+  #teamNew.active{
+    top:calc(env(safe-area-inset-top, 0px) + 14px)!important;
+    bottom:env(safe-area-inset-bottom, 0px)!important;
+  }
+}
