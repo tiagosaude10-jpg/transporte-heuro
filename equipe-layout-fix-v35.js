@@ -40,12 +40,24 @@ document.addEventListener('click',event=>{
 window.addEventListener('pageshow',bindLayout);
 bindLayout();
 
+function loadPdfFix(){
+  if(document.getElementById('planilhaPendenciasPdfClaroScript'))return;
+  const fix=document.createElement('script');
+  fix.id='planilhaPendenciasPdfClaroScript';
+  fix.src=`planilha-pendencias-pdf-claro.js?v=1-${Date.now()}`;
+  fix.async=false;
+  document.body.appendChild(fix);
+}
+
 // Carrega a planilha geral exclusiva das pendências sem reutilizar a planilha antiga da equipe.
 if(!document.getElementById('planilhaPendenciasGeralScript')){
   const script=document.createElement('script');
   script.id='planilhaPendenciasGeralScript';
-  script.src=`planilha-pendencias-geral.js?v=1-${Date.now()}`;
+  script.src=`planilha-pendencias-geral.js?v=2-${Date.now()}`;
   script.async=false;
+  script.onload=loadPdfFix;
   document.body.appendChild(script);
+}else{
+  loadPdfFix();
 }
 })();
