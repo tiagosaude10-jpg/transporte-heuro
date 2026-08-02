@@ -1,0 +1,79 @@
+(()=>{
+'use strict';
+const DB='heuroTransportFiles',STORE='attachments';
+const $=id=>document.getElementById(id);
+const read=()=>{try{return JSON.parse(localStorage.getItem('heuroRequests')||'[]')}catch{return[]}};
+const save=data=>localStorage.setItem('heuroRequests',JSON.stringify(data));
+const session=()=>{try{return JSON.parse(sessionStorage.getItem('heuroSession')||'null')}catch{return null}};
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]));
+const two=n=>String(n).padStart(2,'0');
+const dateOnly=v=>{if(!v)return'—';const[y,m,d]=String(v).split('-');return y&&m&&d?`${d}/${m}/${y}`:'—'};
+const dateTime=v=>{if(!v)return'—';const d=new Date(v);if(Number.isNaN(d.getTime()))return'—';return `${two(d.getDate())}/${two(d.getMonth()+1)}/${d.getFullYear()} - ${two(d.getHours())}:${two(d.getMinutes())}:${two(d.getSeconds())}`};
+const scheduled=item=>item.transportDate&&item.transportTime?`${dateOnly(item.transportDate)} - ${item.transportTime}`:'—';
+const origin=item=>item.boxNumber?`${item.originSector||'Não informada'} - Box ${item.boxNumber}`:`${item.originSector||'Não informada'} - ${item.ward||'Enfermaria não informada'} / Leito ${item.bed||'não informado'}`;
+const order=data=>data.sort((a,b)=>new Date(`${a.transportDate||'9999-12-31'}T${a.transportTime||'23:59'}`)-new Date(`${b.transportDate||'9999-12-31'}T${b.transportTime||'23:59'}`));
+let acceptedThisView=new Set();
+let visibleCompleted=new Map();
+let pendingViewActive=false;
+function openDb(){return new Promise((ok,no)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE)};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function deleteAttachment(id){try{const db=await openDb();await new Promise((ok,no)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=ok;tx.onerror=()=>no(tx.error)});db.close()}catch(e){console.error(e)}}
+function history(status){const s=session();return{status,at:new Date().toISOString(),by:s?.name||'Usuário',userId:s?.id||''}}
+function showTeam(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('teamNew')?.classList.add('active');window.scrollTo(0,0)}
+function button(item,type){
+ if(type==='accept'){
+  const active=item.status==='Aceito';
+  return `<button class="pending-accept" data-id="${esc(item.id)}" type="button" ${item.status==='Concluído'?'disabled':''} style="border:0;border-radius:10px;padding:10px 13px;background:${item.status==='Concluído'?'#d8dee8':active?'#276749':'#e8eef8'};color:${active?'#fff':'#243b64'};font-weight:800;white-space:nowrap">${item.status==='Concluído'?'—':active?'Desmarcar':'Aceitar'}</button>`
+ }
+ const done=item.status==='Concluído';
+ return `<button class="pending-conclude" data-id="${esc(item.id)}" type="button" style="border:0;border-radius:10px;padding:10px 13px;background:${done?'#5b3f82':'#b42318'};color:#fff;font-weight:800;white-space:nowrap">${done?'Desconcluir':'Concluir'}</button>`
+}
+function cell(value,center=false){return `<td style="padding:10px;${center?'text-align:center;':''}">${value}</td>`}
+function row(item){return `<tr data-row-id="${esc(item.id)}">${cell(esc(item.protocol||'—'),true)}${cell(esc(dateTime(item.createdAt)),true)}${cell(esc(dateTime(item.acceptedAt)),true)}${cell(esc(dateTime(item.completedAt)),true)}${cell(`<button class="open-transport" data-id="${esc(item.id)}" style="border:0;background:none;padding:0;color:#174a7e;font-weight:800;text-align:left;text-decoration:underline">${esc(item.patient||'Paciente não informado')}</button>`)}${cell(esc(origin(item)))}${cell(esc(item.destination||'Não informado'))}${cell(esc(scheduled(item)),true)}${cell(`<strong>${esc(item.status||'Solicitado')}</strong>`,true)}${cell(button(item,'accept'),true)}${cell(button(item,'conclude'),true)}${cell(`<button data-pdf-image="1" data-id="${esc(item.id)}" style="border:0;border-radius:10px;padding:10px 13px;background:#e8eef8;color:#243b64;font-weight:800;white-space:nowrap">Abrir PDF</button>`,true)}</tr>`}
+const headers=['Protocolo','Solicitado','Aceite','Conclusão','Paciente','Origem','Destino','Horário agendado','Status','Aceitar','Concluir','PDF'];
+function table(title,data,empty,color,key){const rows=data.map(row).join('');const head=headers.map(h=>`<th style="padding:12px;text-align:center;white-space:nowrap">${h}</th>`).join('');return `<section data-table-key="${key}" style="margin-bottom:22px"><h3 style="margin:0 0 10px;color:${color};font-size:19px">${title}</h3><div style="overflow-x:auto;background:#fff;border-radius:16px;border:1px solid #dbe5ef"><table style="width:100%;border-collapse:collapse;min-width:1850px"><thead><tr style="background:#eef5fc">${head}</tr></thead><tbody>${rows||`<tr><td colspan="12" style="padding:22px;text-align:center">${empty}</td></tr>`}</tbody></table></div></section>`}
+function render(){
+ const box=$('teamListNew');if(!box)return;
+ const all=read();
+ const completed=order(all.filter(x=>x.status==='Concluído'&&visibleCompleted.has(x.id)));
+ const accepted=order(all.filter(x=>x.status==='Aceito'&&acceptedThisView.has(x.id)));
+ const waiting=order(all.filter(x=>x.status==='Solicitado'));
+ box.innerHTML=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:18px"><button id="backTeamMenu" class="back" type="button">Voltar</button><strong>Transportes pendentes</strong></div>${completed.length?table('Transportes concluídos nesta tela',completed,'','#5b3f82','completed'):''}${accepted.length?table('Transportes aceitos',accepted,'','#276749','accepted'):''}${table('Aguardando aceite',waiting,'Nenhum transporte aguardando aceite.','#174a7e','waiting')}`
+}
+async function toggleAccept(id){
+ const data=read();const item=data.find(x=>x.id===id);if(!item||item.status==='Concluído')return false;
+ const accepting=item.status!=='Aceito';
+ if(!confirm(accepting?'Confirmar aceite deste transporte?':'Desmarcar o aceite e voltar para solicitado?'))return false;
+ const s=session();item.status=accepting?'Aceito':'Solicitado';item.history=[...(item.history||[]),history(item.status)];
+ if(accepting){item.executor=s?.name||'Executante';item.executorId=s?.id||'';item.acceptedAt=new Date().toISOString();acceptedThisView.add(item.id)}
+ else{item.executor='';item.executorId='';item.acceptedAt='';acceptedThisView.delete(item.id)}
+ save(data);render();return true
+}
+async function toggleConclusion(id){
+ const data=read();const item=data.find(x=>x.id===id);if(!item)return false;
+ const completing=item.status!=='Concluído';
+ if(completing){
+  if(!confirm('Confirmar a conclusão deste transporte? Você poderá desconcluir enquanto permanecer nesta tela.'))return false;
+  const prior=item.status==='Aceito'?'accepted':'waiting';
+  visibleCompleted.set(id,prior);
+  acceptedThisView.delete(id);
+  const s=session();
+  item.status='Concluído';item.completedAt=new Date().toISOString();item.executor=item.executor||s?.name||'Executante';item.history=[...(item.history||[]),history('Concluído')];
+ }else{
+  if(!confirm('Desconcluir este transporte e voltar ao estado anterior?'))return false;
+  const prior=visibleCompleted.get(id)||'waiting';
+  item.status=prior==='accepted'?'Aceito':'Solicitado';item.completedAt='';item.history=[...(item.history||[]),history(item.status)];visibleCompleted.delete(id);
+  if(prior==='accepted')acceptedThisView.add(id);
+ }
+ save(data);
+ requestAnimationFrame(()=>{render();requestAnimationFrame(render)});
+ return true
+}
+async function finalizeCompleted(){if(!visibleCompleted.size)return;const data=read();for(const[id]of [...visibleCompleted]){const item=data.find(x=>x.id===id);if(item?.status==='Concluído'){await deleteAttachment(id);item.attachmentDeletedAt=new Date().toISOString();item.attachmentName='Imagem excluída após conclusão';item.attachmentAvailable=false}}save(data);visibleCompleted.clear();acceptedThisView.clear()}
+document.addEventListener('click',e=>{
+ const pending=e.target.closest('#openPendingTeam');if(pending){pendingViewActive=true;acceptedThisView=new Set();visibleCompleted=new Map();setTimeout(render,80);return}
+ const a=e.target.closest('.pending-accept');if(a){e.preventDefault();e.stopImmediatePropagation();toggleAccept(a.dataset.id);return}
+ const c=e.target.closest('.pending-conclude');if(c){e.preventDefault();e.stopImmediatePropagation();toggleConclusion(c.dataset.id);return}
+ if(pendingViewActive&&(e.target.closest('#backTeamMenu')||e.target.closest('#teamBackNew')||e.target.closest('#openAcceptedTeamV2')||e.target.closest('#openFinalizedTeam'))){finalizeCompleted();pendingViewActive=false}
+},true);
+window.addEventListener('click',async e=>{const detail=$('transportDetailNew');if(!detail?.classList.contains('active'))return;const action=e.target.closest('[data-status]');if(!action||!detail.contains(action))return;const id=action.dataset.id;const status=action.dataset.status;if(!id||!['Aceito','Concluído'].includes(status))return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();const changed=status==='Aceito'?await toggleAccept(id):await toggleConclusion(id);if(changed){showTeam();render()}},true);
+})();
