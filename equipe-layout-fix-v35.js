@@ -22,38 +22,6 @@ html,body{max-width:100%!important;overflow-x:hidden!important}
 `;
   document.head.appendChild(style);
 }
-function installRegisterFix(){
-  let style=document.getElementById('heuro-register-width-final');
-  if(!style){
-    style=document.createElement('style');
-    style.id='heuro-register-width-final';
-    document.head.appendChild(style);
-  }
-  style.textContent=`
-#registerNew.active{width:100vw!important;max-width:100vw!important;padding-left:0!important;padding-right:0!important;overflow-x:hidden!important}
-#registerNew .register-wrap{width:100vw!important;max-width:100vw!important;margin:0!important;padding:0 6px!important;box-sizing:border-box!important}
-#registerNew .register-wrap>.card{width:100%!important;max-width:none!important;margin:0!important;padding:10px!important;box-sizing:border-box!important;border-radius:18px!important}
-#registerNew #registerFormNew,#registerNew .register-grid,#registerNew .register-field,#registerNew .register-field input,#registerNew .register-field select{width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important}
-@media(max-width:560px){#registerNew .register-wrap{padding:0 3px!important}#registerNew .register-wrap>.card{padding:8px!important}}
-`;
-  const select=document.getElementById('regProfile');
-  if(select){
-    let placeholder=[...select.options].find(option=>option.value==='');
-    if(!placeholder){
-      placeholder=document.createElement('option');
-      placeholder.value='';
-      select.insertBefore(placeholder,select.firstChild);
-    }
-    placeholder.textContent='Selecione';
-    placeholder.disabled=true;
-    select.required=true;
-    if(!select.dataset.profileChosen)select.value='';
-    if(select.dataset.finalPlaceholderBound!=='1'){
-      select.addEventListener('change',()=>{select.dataset.profileChosen='1'});
-      select.dataset.finalPlaceholderBound='1';
-    }
-  }
-}
 function goToTeamMenu(){
   const commandButton=document.getElementById('cmdTeam');
   if(commandButton){
@@ -63,7 +31,6 @@ function goToTeamMenu(){
 }
 function bindLayout(){
   installStyles();
-  installRegisterFix();
   const team=document.getElementById('teamNew');
   if(team?.classList.contains('active'))team.scrollLeft=0;
 }
@@ -77,6 +44,5 @@ document.addEventListener('click',event=>{
   goToTeamMenu();
 },true);
 window.addEventListener('pageshow',bindLayout);
-[0,100,300,700,1500].forEach(delay=>setTimeout(bindLayout,delay));
 bindLayout();
 })();
