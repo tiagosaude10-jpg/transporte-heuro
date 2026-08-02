@@ -1,0 +1,18 @@
+(()=>{
+'use strict';
+const DB='heuroTransportFiles',STORE='attachments';
+const read=()=>{try{return JSON.parse(localStorage.getItem('heuroRequests')||'[]')}catch{return[]}};
+const formatDate=v=>{if(!v)return'Não informado';const[y,m,d]=String(v).split('-');return y&&m&&d?`${d}/${m}/${y}`:v};
+function openDb(){return new Promise((ok,no)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(STORE))r.result.createObjectStore(STORE)};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})}
+async function getAttachment(id){const db=await openDb();const out=await new Promise((ok,no)=>{const tx=db.transaction(STORE,'readonly');const r=tx.objectStore(STORE).get(id);r.onsuccess=()=>ok(r.result||null);r.onerror=()=>no(r.error)});db.close();return out}
+function fileToDataUrl(blob){return new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(blob)})}
+async function loadPdf(){if(window.jspdf?.jsPDF)return;await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)})}
+async function generate(item){await loadPdf();const {jsPDF}=window.jspdf;const d=new jsPDF({unit:'mm',format:'a4',compress:true});
+ d.setFont('helvetica','bold');d.setFontSize(20);d.text('TRANSPORTE HEURO',105,18,{align:'center'});d.setDrawColor(25,62,104);d.setLineWidth(.7);d.line(28,23,182,23);
+ const rows=[['Protocolo',item.protocol],['Status',item.status],['Paciente',item.patient],['Origem',`${item.originSector||'Não informada'} ${item.boxNumber?'- Box '+item.boxNumber:`- ${item.ward||''} / Leito ${item.bed||''}`}`],['Destino',item.destination],['Data e hora',`${formatDate(item.transportDate)} às ${item.transportTime||''}`],['Ambulância',item.ambulanceType],['Prioridade',item.priority],['Solicitante',item.requester],['Executante',item.executor||'Não definido'],['Observações',item.notes||'Sem observações']];
+ let y=34;for(const[l,v]of rows){d.setFont('helvetica','bold');d.setFontSize(12.5);d.text(`${l}:`,18,y);d.setFont('helvetica','normal');d.setFontSize(12.5);const lines=d.splitTextToSize(String(v||'Não informado'),128);d.text(lines,62,y);y+=Math.max(9,lines.length*6.2+3);if(y>188)break}
+ d.setDrawColor(190,200,212);d.setLineWidth(.3);d.line(18,198,192,198);d.setFont('helvetica','bold');d.setFontSize(11);d.setTextColor(70,85,105);d.text('ANOTAÇÕES DA EQUIPE',18,205);d.setTextColor(0,0,0);for(let ly=214;ly<=275;ly+=12){d.setDrawColor(220,226,233);d.line(18,ly,192,ly)}
+ const att=await getAttachment(item.id);if(att?.blob&&String(att.type||'').startsWith('image/')){const src=await fileToDataUrl(att.blob);const img=await new Promise((ok,no)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=no;im.src=src});d.addPage();d.setFont('helvetica','bold');d.setFontSize(16);d.text('DOCUMENTO DA REGULAÇÃO',105,16,{align:'center'});const ratio=Math.min(180/img.naturalWidth,258/img.naturalHeight);const w=img.naturalWidth*ratio,h=img.naturalHeight*ratio;d.addImage(src,String(att.type).includes('png')?'PNG':'JPEG',(210-w)/2,25,w,h)}
+ d.save(`Transporte HEURO - ${item.protocol}.pdf`)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-pdf-image]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const item=read().find(x=>x.id===b.dataset.id);if(!item)return;generate(item).catch(err=>{console.error(err);alert('Não foi possível gerar o PDF.')})},true);
+})();
