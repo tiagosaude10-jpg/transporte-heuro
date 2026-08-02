@@ -1,110 +1,18 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-const readUsers=()=>{try{return JSON.parse(localStorage.getItem('heuroUsers')||'[]')}catch{return[]}};
-const saveUsers=data=>localStorage.setItem('heuroUsers',JSON.stringify(data));
-
-function ensureFields(){
-  const form=$('registerFormNew');
-  const profile=$('regProfile');
-  if(!form||!profile||$('regRole'))return;
-
-  const roleLabel=document.createElement('label');
-  roleLabel.setAttribute('for','regRole');
-  roleLabel.textContent='Cargo/Função';
-
-  const role=document.createElement('select');
-  role.id='regRole';
-  role.required=true;
-  role.innerHTML=`
-    <option value="">Selecione o cargo/função</option>
-    <option value="Enfermeiro">Enfermeiro</option>
-    <option value="Técnico de Enfermagem">Técnico de Enfermagem</option>
-    <option value="Médico">Médico</option>
-    <option value="Motorista">Motorista</option>
-    <option value="Maqueiro">Maqueiro</option>
-    <option value="Fisioterapeuta">Fisioterapeuta</option>
-    <option value="Administrativo">Administrativo</option>
-    <option value="Coordenação">Coordenação</option>
-    <option value="Direção">Direção</option>
-    <option value="Outro">Outro</option>`;
-
-  const otherLabel=document.createElement('label');
-  otherLabel.id='regRoleOtherLabel';
-  otherLabel.setAttribute('for','regRoleOther');
-  otherLabel.textContent='Informe o outro cargo/função';
-  otherLabel.style.display='none';
-
-  const other=document.createElement('input');
-  other.id='regRoleOther';
-  other.placeholder='Digite o cargo ou a função';
-  other.style.textTransform='uppercase';
-  other.setAttribute('autocapitalize','characters');
-  other.style.display='none';
-
-  profile.insertAdjacentElement('afterend',roleLabel);
-  roleLabel.insertAdjacentElement('afterend',role);
-  role.insertAdjacentElement('afterend',otherLabel);
-  otherLabel.insertAdjacentElement('afterend',other);
-
-  role.addEventListener('change',()=>{
-    const custom=role.value==='Outro';
-    otherLabel.style.display=custom?'':'none';
-    other.style.display=custom?'':'none';
-    other.required=custom;
-    if(!custom)other.value='';
-  });
-  other.addEventListener('input',()=>{other.value=other.value.toLocaleUpperCase('pt-BR')});
+const users=()=>{try{return JSON.parse(localStorage.getItem('heuroUsers')||'[]')}catch{return[]}};
+const save=data=>localStorage.setItem('heuroUsers',JSON.stringify(data));
+const digits=v=>String(v||'').replace(/\D/g,'').slice(0,11);
+const cpfMask=v=>digits(v).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+function validCpf(v){const c=digits(v);if(c.length!==11||/^(\d)\1+$/.test(c))return false;let s=0;for(let i=0;i<9;i++)s+=Number(c[i])*(10-i);let d=(s*10)%11;if(d===10)d=0;if(d!==Number(c[9]))return false;s=0;for(let i=0;i<10;i++)s+=Number(c[i])*(11-i);d=(s*10)%11;if(d===10)d=0;return d===Number(c[10])}
+function showLogin(){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('loginNew')?.classList.add('active');window.scrollTo(0,0)}
+function build(){
+ const form=$('registerFormNew');if(!form||form.dataset.complete==='1')return;form.dataset.complete='1';
+ form.innerHTML=`<div class="register-brand"><div class="register-brand-mark">H+</div><div><strong>HEURO TRANSPORTE</strong><small>Cadastro de acesso</small></div></div><div class="register-intro"><span>PRIMEIRO ACESSO</span><h2>Crie seu cadastro</h2><p>Preencha os dados. O acesso será liberado após aprovação de um administrador.</p></div><div class="register-grid"><label class="wide">Nome completo<small>Nome que aparecerá nas planilhas e documentos.</small><input id="regName" autocapitalize="characters" autocomplete="name" required></label><label>Nome de usuário<small>Nome exibido na abertura do sistema.</small><input id="regUser" autocomplete="username" required></label><label>CPF<input id="regCpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required></label><label class="wide">E-mail<input id="regEmail" type="email" autocomplete="email" placeholder="nome@exemplo.com" required></label><label>Cargo/Função<select id="regRole" required><option value="">Selecione</option><option>Enfermeiro</option><option>Técnico de Enfermagem</option><option>Médico</option><option>Motorista</option><option>Maqueiro</option><option>Fisioterapeuta</option><option>Administrativo</option><option>Coordenação</option><option>Direção</option><option value="Outro">Outro</option></select></label><label id="regOtherRoleWrap" class="hidden-role">Outro cargo/função<input id="regOtherRole" placeholder="Digite o cargo ou função"></label><label class="wide">Perfil solicitado<select id="regProfile" required><option value="solicitante">Solicitante de transporte</option><option value="transporte">Executante de transporte</option><option value="administrador">Administrador</option></select></label><label>Senha<input id="regPass" type="password" autocomplete="new-password" minlength="6" required></label><label>Confirmar senha<input id="regPassConfirm" type="password" autocomplete="new-password" minlength="6" required></label></div><button class="register-submit" type="submit">Enviar cadastro para aprovação</button><button id="registerBackNew" class="register-back" type="button">Voltar</button><p id="registerMessageNew" class="register-message" aria-live="polite"></p>`;
+ if(!$('completeRegisterStyles')){const style=document.createElement('style');style.id='completeRegisterStyles';style.textContent=`#registerNew{background:linear-gradient(180deg,#f4f8ff 0,#fff 50%);min-height:100dvh;padding:calc(env(safe-area-inset-top,0px) + 22px) 14px calc(env(safe-area-inset-bottom,0px) + 28px);overflow-y:auto}.register-wrap{max-width:720px!important;margin:0 auto}.register-wrap>.card{border:0!important;border-radius:28px!important;padding:22px!important;background:#fff!important;box-shadow:0 18px 50px rgba(17,48,93,.13)!important}.register-brand{display:flex;align-items:center;gap:12px;padding:2px 0 18px;border-bottom:1px solid #e5edf7}.register-brand-mark{width:50px;height:50px;border-radius:16px;background:linear-gradient(145deg,#075fbd,#073477);color:#78d22d;display:grid;place-items:center;font-weight:900;font-size:20px}.register-brand strong{display:block;color:#0b438e;font-size:17px}.register-brand small{display:block;color:#718096;margin-top:2px}.register-intro{padding:22px 0 18px}.register-intro span{color:#1164ad;font-size:12px;letter-spacing:.11em;font-weight:900}.register-intro h2{margin:5px 0 6px;font-size:30px;color:#14233d}.register-intro p{margin:0;color:#66758b;line-height:1.45}.register-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.register-grid label{display:grid;gap:7px;color:#172641;font-weight:800}.register-grid label.wide{grid-column:1/-1}.register-grid label small{font-weight:400;color:#78869a;font-size:12px}.register-grid input,.register-grid select{width:100%;min-height:52px;border:1px solid #ccd8e7;border-radius:14px;padding:0 14px;font-size:16px;background:#fff;box-sizing:border-box}.register-grid input:focus,.register-grid select:focus{outline:3px solid rgba(35,132,226,.22);border-color:#438fd8}.hidden-role{display:none!important}.register-submit{width:100%;min-height:56px;margin-top:22px;border:0;border-radius:15px;background:linear-gradient(135deg,#0877c9,#0751a5);color:#fff;font-size:17px;font-weight:900}.register-back{width:100%;border:0;background:transparent;color:#0c61aa;font-size:16px;padding:17px}.register-message{text-align:center;margin:4px 0 0;min-height:20px}@media(max-width:560px){.register-wrap>.card{padding:18px!important;border-radius:23px!important}.register-grid{grid-template-columns:1fr}.register-grid label.wide{grid-column:auto}.register-intro h2{font-size:27px}}`;document.head.appendChild(style)}
+ const name=$('regName');name.style.textTransform='uppercase';name.addEventListener('input',()=>{const p=name.selectionStart;name.value=name.value.toLocaleUpperCase('pt-BR');try{name.setSelectionRange(p,p)}catch{}});$('regCpf').addEventListener('input',e=>e.target.value=cpfMask(e.target.value));$('regRole').addEventListener('change',()=>{const custom=$('regRole').value==='Outro';$('regOtherRoleWrap').classList.toggle('hidden-role',!custom);$('regOtherRole').required=custom;if(!custom)$('regOtherRole').value=''});$('registerBackNew').addEventListener('click',showLogin);
 }
-
-function handleSubmit(event){
-  const form=event.target;
-  if(form?.id!=='registerFormNew')return;
-  event.preventDefault();
-  event.stopPropagation();
-  event.stopImmediatePropagation();
-
-  const data=readUsers();
-  const username=$('regUser')?.value.trim()||'';
-  const role=$('regRole')?.value||'';
-  const other=$('regRoleOther')?.value.trim().toLocaleUpperCase('pt-BR')||'';
-  const message=$('registerMessageNew');
-
-  if(data.some(user=>String(user.username||'').toLowerCase()===username.toLowerCase())){
-    if(message)message.textContent='Este usuário já existe.';
-    return;
-  }
-  if(!role){
-    if(message)message.textContent='Selecione o cargo/função.';
-    $('regRole')?.focus();
-    return;
-  }
-  if(role==='Outro'&&!other){
-    if(message)message.textContent='Informe o outro cargo/função.';
-    $('regRoleOther')?.focus();
-    return;
-  }
-
-  data.push({
-    id:String(Date.now()),
-    fullName:$('regName')?.value.trim().toLocaleUpperCase('pt-BR')||'',
-    username,
-    password:$('regPass')?.value||'',
-    profile:$('regProfile')?.value||'solicitante',
-    role:role==='Outro'?other:role,
-    cargoFuncao:role==='Outro'?other:role,
-    status:'aguardando'
-  });
-  saveUsers(data);
-  if(message)message.textContent='Cadastro enviado para aprovação.';
-  form.reset();
-  $('regRoleOtherLabel')?.style.setProperty('display','none');
-  $('regRoleOther')?.style.setProperty('display','none');
-  setTimeout(()=>{$('registerBackNew')?.click()},900);
-}
-
-function start(){ensureFields()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-new MutationObserver(ensureFields).observe(document.documentElement,{subtree:true,childList:true});
-document.addEventListener('submit',handleSubmit,true);
+function submit(e){if(e.target?.id!=='registerFormNew')return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();const msg=$('registerMessageNew');msg.style.color='#a11';const data=users();const username=$('regUser').value.trim();const cpf=$('regCpf').value;const email=$('regEmail').value.trim().toLowerCase();const pass=$('regPass').value;const confirm=$('regPassConfirm').value;if(!validCpf(cpf)){msg.textContent='Informe um CPF válido.';return}if(pass!==confirm){msg.textContent='A confirmação da senha não confere.';return}if(data.some(u=>String(u.username||'').toLowerCase()===username.toLowerCase())){msg.textContent='Este nome de usuário já existe.';return}if(data.some(u=>digits(u.cpf)===digits(cpf))){msg.textContent='Este CPF já está cadastrado.';return}if(data.some(u=>String(u.email||'').toLowerCase()===email)){msg.textContent='Este e-mail já está cadastrado.';return}const role=$('regRole').value==='Outro'?$('regOtherRole').value.trim():$('regRole').value;data.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),fullName:$('regName').value.trim().toLocaleUpperCase('pt-BR'),username,cpf:digits(cpf),email,cargoFuncao:role,role,profile:$('regProfile').value,password:pass,status:'aguardando',createdAt:new Date().toISOString()});save(data);msg.style.color='#08743a';msg.textContent='Cadastro enviado para aprovação.';e.target.reset();$('regOtherRoleWrap').classList.add('hidden-role');setTimeout(showLogin,1100)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',build);else build();new MutationObserver(build).observe(document.documentElement,{subtree:true,childList:true});document.addEventListener('submit',submit,true);
 })();
