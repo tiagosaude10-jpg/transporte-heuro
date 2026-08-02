@@ -40,12 +40,21 @@ document.addEventListener('click',event=>{
 window.addEventListener('pageshow',bindLayout);
 bindLayout();
 
+function loadStatusColors(){
+  if(document.getElementById('coresStatusHeuroScript'))return;
+  const colors=document.createElement('script');
+  colors.id='coresStatusHeuroScript';
+  colors.src=`cores-status-heuro.js?v=1-${Date.now()}`;
+  colors.async=false;
+  document.body.appendChild(colors);
+}
 function loadPdfFix(){
-  if(document.getElementById('planilhaPendenciasPdfClaroScript'))return;
+  if(document.getElementById('planilhaPendenciasPdfClaroScript')){loadStatusColors();return}
   const fix=document.createElement('script');
   fix.id='planilhaPendenciasPdfClaroScript';
   fix.src=`planilha-pendencias-pdf-claro.js?v=1-${Date.now()}`;
   fix.async=false;
+  fix.onload=loadStatusColors;
   document.body.appendChild(fix);
 }
 
