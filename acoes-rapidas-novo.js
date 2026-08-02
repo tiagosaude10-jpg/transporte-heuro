@@ -15,8 +15,8 @@
     const style=document.createElement('style');
     style.id='quickActionsStyles';
     style.textContent=`
-      .quick-page{max-width:760px;margin:0 auto;padding:20px 14px 36px}
-      .quick-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
+      .quick-page{max-width:760px;margin:0 auto;padding:0 14px 36px}
+      .quick-head{position:sticky;top:0;z-index:50;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:0 -14px 16px;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px 16px;background:#fff;border-bottom:1px solid #edf1f6;box-shadow:0 6px 14px rgba(20,40,80,.06)}
       .quick-head span{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0b5fa5}
       .quick-head h2{margin:4px 0 0}
       .quick-back{border:0;border-radius:11px;padding:10px 14px;background:#e8eef7;color:#13213a;font-weight:700}
