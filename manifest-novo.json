@@ -2,7 +2,7 @@
   "name": "Transporte HEURO",
   "short_name": "HEURO Transporte",
   "description": "Aplicativo de solicitação e acompanhamento de transporte do HEURO",
-  "start_url": "./index-novo.html",
+  "start_url": "./index-novo.html?estrutura=20260802-1751",
   "scope": "./",
   "display": "standalone",
   "background_color": "#071b4d",
