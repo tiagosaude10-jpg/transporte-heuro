@@ -34,9 +34,10 @@ function table(title,data,empty,color){const rows=data.map(row).join('');const h
 function render(){
  const box=$('teamListNew');if(!box)return;
  const all=read();
- const accepted=order(all.filter(x=>(x.status==='Aceito'&&acceptedThisView.has(x.id))||(x.status==='Concluído'&&visibleCompleted.get(x.id)==='accepted')));
- const waiting=order(all.filter(x=>x.status==='Solicitado'||(x.status==='Concluído'&&visibleCompleted.get(x.id)==='waiting')));
- box.innerHTML=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:18px"><button id="backTeamMenu" class="back" type="button">Voltar</button><strong>Transportes pendentes</strong></div>${accepted.length?table('Transportes aceitos',accepted,'','#276749'):''}${table('Aguardando aceite',waiting,'Nenhum transporte aguardando aceite.','#174a7e')}`
+ const completed=order(all.filter(x=>x.status==='Concluído'&&visibleCompleted.has(x.id)));
+ const accepted=order(all.filter(x=>x.status==='Aceito'&&acceptedThisView.has(x.id)));
+ const waiting=order(all.filter(x=>x.status==='Solicitado'));
+ box.innerHTML=`<div style="display:flex;gap:10px;align-items:center;margin-bottom:18px"><button id="backTeamMenu" class="back" type="button">Voltar</button><strong>Transportes pendentes</strong></div>${completed.length?table('Transportes concluídos nesta tela',completed,'','#5b3f82'):''}${accepted.length?table('Transportes aceitos',accepted,'','#276749'):''}${table('Aguardando aceite',waiting,'Nenhum transporte aguardando aceite.','#174a7e')}`
 }
 async function toggleAccept(id){
  const data=read();const item=data.find(x=>x.id===id);if(!item||item.status==='Concluído')return false;
