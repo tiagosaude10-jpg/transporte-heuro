@@ -38,28 +38,81 @@ document.addEventListener('submit',()=>setTimeout(applyPermissions,60),true);
 applyPermissions();
 })();
 
-/* Correção do calendário da data de nascimento no iPhone: o toque atinge diretamente o input nativo. */
+/* Calendário da data de nascimento: toque nativo + botão X para limpar. */
 (()=>{
 'use strict';
-function applyCalendarFix(){
+function fix(){
+  const control=document.querySelector('.birth-date-control');
   const native=document.getElementById('birthDateNative');
-  const button=document.querySelector('.birth-date-calendar');
-  const wrap=document.querySelector('.birth-date-control');
-  if(!native||!button||!wrap)return;
-  wrap.style.position='relative';
-  wrap.style.overflow='visible';
-  button.style.pointerEvents='none';
-  button.style.zIndex='2';
-  Object.assign(native.style,{
-    position:'absolute',right:'8px',top:'50%',transform:'translateY(-50%)',
-    width:'44px',height:'44px',margin:'0',padding:'0',opacity:'0.001',
-    pointerEvents:'auto',zIndex:'3',cursor:'pointer',border:'0',background:'transparent'
-  });
+  const display=document.getElementById('birthDateNew');
+  const calendar=document.querySelector('.birth-date-calendar');
+  if(!control||!native||!display||!calendar)return false;
+
+  control.style.position='relative';
+  control.style.overflow='visible';
+  display.style.paddingRight='104px';
+
+  calendar.style.right='8px';
+  calendar.style.pointerEvents='none';
+  calendar.style.zIndex='2';
+
+  native.style.setProperty('position','absolute','important');
+  native.style.setProperty('right','4px','important');
+  native.style.setProperty('top','50%','important');
+  native.style.setProperty('transform','translateY(-50%)','important');
+  native.style.setProperty('width','48px','important');
+  native.style.setProperty('height','48px','important');
+  native.style.setProperty('margin','0','important');
+  native.style.setProperty('padding','0','important');
+  native.style.setProperty('opacity','0.01','important');
+  native.style.setProperty('display','block','important');
+  native.style.setProperty('visibility','visible','important');
+  native.style.setProperty('pointer-events','auto','important');
+  native.style.setProperty('z-index','5','important');
+  native.style.setProperty('border','0','important');
+  native.style.setProperty('background','transparent','important');
   native.removeAttribute('tabindex');
   native.setAttribute('aria-label','Selecionar data de nascimento no calendário');
+
+  if(!control.querySelector('.birth-date-clear')){
+    const clear=document.createElement('button');
+    clear.type='button';
+    clear.className='birth-date-clear';
+    clear.setAttribute('aria-label','Apagar data de nascimento');
+    clear.textContent='×';
+    clear.style.cssText='position:absolute;right:52px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;background:transparent;color:#65758b;font-size:30px;line-height:36px;padding:0;display:flex;align-items:center;justify-content:center;z-index:7;';
+    clear.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      display.value='';
+      native.value='';
+      display.setCustomValidity('');
+      display.focus();
+    });
+    control.appendChild(clear);
+  }
+
+  if(native.dataset.syncBound!=='1'){
+    native.dataset.syncBound='1';
+    native.addEventListener('change',()=>{
+      if(!native.value){display.value='';return;}
+      const [year,month,day]=native.value.split('-');
+      display.value=`${day}/${month}/${year}`;
+      display.setCustomValidity('');
+    });
+  }
+  return true;
 }
-function ready(){applyCalendarFix();setTimeout(applyCalendarFix,100);setTimeout(applyCalendarFix,500)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready);else ready();
-new MutationObserver(applyCalendarFix).observe(document.documentElement,{subtree:true,childList:true});
-window.addEventListener('pageshow',ready);
+function start(){
+  let tries=0;
+  const run=()=>{
+    tries+=1;
+    if(fix()||tries>50)clearInterval(timer);
+  };
+  run();
+  const timer=setInterval(run,100);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});
+window.addEventListener('pageshow',start);
 })();
