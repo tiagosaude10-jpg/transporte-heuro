@@ -22,16 +22,19 @@
       .quick-head h2{margin:4px 0 0}
       .quick-back{border:0;border-radius:11px;padding:10px 14px;background:#e8eef7;color:#13213a;font-weight:700}
       .quick-list{display:grid;gap:12px}
-      .quick-card{width:100%;text-align:left;border:1px solid #dce4ef;border-radius:17px;background:#fff;padding:16px;box-shadow:0 8px 22px rgba(20,40,80,.08);box-sizing:border-box}
+      .quick-card{width:100%;text-align:left;border:1px solid #dce4ef;border-radius:17px;padding:16px;box-shadow:0 8px 22px rgba(20,40,80,.12);box-sizing:border-box;transition:transform .12s ease,box-shadow .12s ease}
       button.quick-card{appearance:none;font:inherit;cursor:pointer}
-      .quick-card:active{transform:scale(.992)}
-      .quick-card strong{display:block;font-size:17px;margin:7px 0 5px;color:#13213a}
-      .quick-card small,.quick-card span{display:block;color:#5f6d82;line-height:1.42}
-      .quick-status{display:inline-block!important;width:auto;padding:5px 9px;border-radius:999px;background:#fff0d9;color:#a65a00!important;font-weight:800;font-size:12px}
-      .quick-status.accepted{background:#dcf7e8;color:#08743a!important}
-      .quick-status.done{background:#e9def6;color:#5b3f82!important}
-      .quick-person{margin-top:6px;font-size:13px;color:#46566d!important}
-      .quick-person b{color:#243b64}
+      .quick-card:active{transform:scale(.986);box-shadow:0 4px 12px rgba(20,40,80,.16)}
+      .quick-card.pending{background:linear-gradient(145deg,#ff9f0a,#ef7900);border-color:#db6d00}
+      .quick-card.accepted{background:linear-gradient(145deg,#25a85d,#128044);border-color:#0b6f39}
+      .quick-card.done{background:linear-gradient(145deg,#7752a0,#5b3f82);border-color:#513575}
+      .quick-card strong{display:block;font-size:17px;margin:8px 0 5px;color:#fff}
+      .quick-card small,.quick-card span{display:block;color:rgba(255,255,255,.94);line-height:1.45}
+      .quick-status{display:inline-block!important;width:auto;padding:6px 10px;border-radius:999px;background:#c85d00;color:#fff!important;font-weight:900;font-size:12px;box-shadow:0 3px 8px rgba(102,44,0,.22)}
+      .quick-status.accepted{background:#076b35;color:#fff!important;box-shadow:0 3px 8px rgba(0,70,33,.24)}
+      .quick-status.done{background:#49306b;color:#fff!important}
+      .quick-person{margin-top:6px;font-size:13px;color:rgba(255,255,255,.96)!important}
+      .quick-person b{color:#fff}
       .pending-sheet-button{width:100%;border:0;border-radius:14px;padding:14px 16px;background:linear-gradient(135deg,#0b6fc1,#084f9b);color:#fff;font-weight:900;font-size:15px;box-shadow:0 8px 18px rgba(8,79,155,.20);margin-bottom:4px}
       .quick-empty{background:#fff;border-radius:17px;padding:22px;text-align:center;color:#657389;border:1px solid #dce4ef}
       .profile-card,.more-card{background:#fff;border:1px solid #dce4ef;border-radius:18px;padding:20px;box-shadow:0 8px 22px rgba(20,40,80,.08)}
@@ -59,26 +62,19 @@
     return screen;
   }
 
-  function openPendingSheet(){
-    const teamButton=$('cmdTeam');
-    if(!teamButton)return;
-    teamButton.click();
-    let attempts=0;
-    const tryOpen=()=>{
-      const pendingButton=$('openPendingTeam');
-      if(pendingButton){pendingButton.click();return}
-      if(++attempts<12)setTimeout(tryOpen,80);
-    };
-    setTimeout(tryOpen,80);
+  function openPendingSheet(requestId=''){
+    document.dispatchEvent(new CustomEvent('heuro:open-pending-sheet',{detail:{requestId:String(requestId||'')}}));
   }
 
   function card(item,clickable=false){
     const location=item.boxNumber?`Box ${esc(item.boxNumber)}`:`Enfermaria ${esc(item.ward||'não informada')} · Leito ${esc(item.bed||'não informado')}`;
-    const status=isAccepted(item)?'Aceito / Em andamento':(item.status||'Solicitado');
-    const statusClass=isDone(item)?'done':(isAccepted(item)?'accepted':'');
+    const accepted=isAccepted(item);
+    const status=accepted?'Aceito / Em andamento':(item.status||'Solicitado');
+    const statusClass=isDone(item)?'done':(accepted?'accepted':'');
+    const cardClass=isDone(item)?'done':(accepted?'accepted':'pending');
     const tag=clickable?'button':'article';
     const attrs=clickable?`type="button" data-open-pending-sheet="1" data-request-id="${esc(item.id)}"`:'';
-    return `<${tag} class="quick-card" ${attrs}><span class="quick-status ${statusClass}">${esc(status)}</span><strong>${esc(item.patient||'Paciente não informado')}</strong><small>${esc(item.protocol||'Sem protocolo')}</small><span>${esc(item.originSector||'Origem não informada')} · ${location}</span><span>Destino: ${esc(item.destination||'Não informado')}</span><span>Horário agendado: ${formatDate(item.transportDate)} às ${esc(item.transportTime||'--:--')}</span><span class="quick-person"><b>Solicitado por:</b> ${esc(item.requester||'Não informado')}</span><span class="quick-person"><b>Aceito por:</b> ${esc(item.executor||'—')}</span></${tag}>`;
+    return `<${tag} class="quick-card ${cardClass}" ${attrs}><span class="quick-status ${statusClass}">${esc(status)}</span><strong>${esc(item.patient||'Paciente não informado')}</strong><small>${esc(item.protocol||'Sem protocolo')}</small><span>${esc(item.originSector||'Origem não informada')} · ${location}</span><span>Destino: ${esc(item.destination||'Não informado')}</span><span>Horário agendado: ${formatDate(item.transportDate)} às ${esc(item.transportTime||'--:--')}</span><span class="quick-person"><b>Solicitado por:</b> ${esc(item.requester||'Não informado')}</span><span class="quick-person"><b>Aceito por:</b> ${esc(item.executor||'—')}</span></${tag}>`;
   }
 
   function render(screenId,title,eyebrow,filter,sorter,emptyText,options={}){
@@ -108,7 +104,7 @@
     if(!target)return;
     event.preventDefault();
     event.stopImmediatePropagation();
-    openPendingSheet();
+    openPendingSheet(target.dataset.requestId||'');
   },true);
 
   bind('cmdPending',()=>render('pendingNew','Solicitações pendentes','Ações rápidas',item=>!isDone(item),(a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0),'Nenhuma solicitação pendente no momento.',{pending:true}));
