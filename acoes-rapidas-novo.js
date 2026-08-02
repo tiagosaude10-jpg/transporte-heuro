@@ -15,8 +15,8 @@
     const style=document.createElement('style');
     style.id='quickActionsStyles';
     style.textContent=`
-      .quick-page{max-width:760px;margin:0 auto;padding:0 14px 36px}
-      .quick-head{position:sticky;top:0;z-index:50;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin:0 -14px 16px;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px 16px;background:#fff;border-bottom:1px solid #edf1f6;box-shadow:0 6px 14px rgba(20,40,80,.06)}
+      .quick-page{max-width:760px;margin:0 auto;padding:20px 14px 36px}
+      .quick-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}
       .quick-head span{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#0b5fa5}
       .quick-head h2{margin:4px 0 0}
       .quick-back{border:0;border-radius:11px;padding:10px 14px;background:#e8eef7;color:#13213a;font-weight:700}
@@ -32,6 +32,11 @@
       .more-grid{display:grid;gap:12px}.more-action{width:100%;border:0;border-radius:14px;padding:15px;text-align:left;background:#eef5fb;color:#0b5fa5;font-weight:800}
       .notice{background:#fff;border-left:5px solid #0b5fa5;border-radius:14px;padding:15px;box-shadow:0 7px 18px rgba(20,40,80,.07)}
       .notice strong{display:block;margin-bottom:5px}.notice small{color:#66758a}
+
+      #pendingNew.active{position:fixed;inset:0;overflow:hidden;background:#fff;padding-top:env(safe-area-inset-top,0px)}
+      #pendingNew.active .quick-page{height:100%;max-width:760px;margin:0 auto;padding:18px 14px 0;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
+      #pendingNew.active .quick-head{flex:0 0 auto;margin:0 -14px;padding:0 14px 16px;background:#fff;border-bottom:1px solid #edf1f6;box-shadow:0 6px 14px rgba(20,40,80,.06);z-index:5}
+      #pendingNew.active .quick-list{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 0 36px;overscroll-behavior:contain}
     `;
     document.head.appendChild(style);
   }
@@ -60,6 +65,7 @@
     let data=readRequests().filter(filter);
     if(sorter)data=data.sort(sorter);
     list.innerHTML=data.length?data.map(card).join(''):`<div class="quick-empty">${esc(emptyText)}</div>`;
+    list.scrollTop=0;
     show(screenId);
   }
 
@@ -76,7 +82,6 @@
   bind('cmdPending',()=>render('pendingNew','Solicitações pendentes','Ações rápidas',item=>!isDone(item),(a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0),'Nenhuma solicitação pendente no momento.'));
   bind('cmdAgenda',()=>render('agendaNew','Agenda de transportes','Programação',item=>!isDone(item)&&Boolean(item.transportDate),(a,b)=>`${a.transportDate||''}T${a.transportTime||''}`.localeCompare(`${b.transportDate||''}T${b.transportTime||''}`),'Nenhum transporte programado na agenda.'));
   bind('cmdHistory',()=>render('historyNew','Histórico de transportes','Consultas',item=>isDone(item),(a,b)=>new Date(b.completedAt||b.createdAt||0)-new Date(a.completedAt||a.createdAt||0),'Nenhum transporte concluído no histórico.'));
-
   bind('cmdHome',()=>show('commandNew'));
   bind('cmdTransport',()=>render('allTransportsNew','Todos os transportes','Barra inferior',()=>true,(a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0),'Nenhum transporte cadastrado.'));
 
