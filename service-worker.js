@@ -1,7 +1,8 @@
-const CACHE_NAME = 'transporte-heuro-fixed-datetime-css-20260803-1234';
+const CACHE_NAME = 'transporte-heuro-publish-reset-20260803-1246';
+const APP_BUILD = '20260803-1246';
 
-self.addEventListener('install', () => {
-  self.skipWaiting();
+self.addEventListener('install', (event) => {
+  event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event) => {
@@ -9,11 +10,13 @@ self.addEventListener('activate', (event) => {
     const keys = await caches.keys();
     await Promise.all(keys.map((key) => caches.delete(key)));
     await self.clients.claim();
+
     const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     await Promise.all(clients.map((client) => {
       try {
         const url = new URL(client.url);
-        url.searchParams.set('appUpdate', '20260803-1234');
+        url.searchParams.set('build', APP_BUILD);
+        url.searchParams.delete('appUpdate');
         return client.navigate(url.toString());
       } catch (_) {
         return Promise.resolve();
@@ -24,5 +27,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  event.respondWith(fetch(event.request, { cache: 'no-store' }));
+  event.respondWith((async () => {
+    try {
+      return await fetch(event.request, { cache: 'reload' });
+    } catch (_) {
+      return fetch(event.request, { cache: 'no-store' });
+    }
+  })());
 });
