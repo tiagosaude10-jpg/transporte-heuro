@@ -73,7 +73,7 @@ if(!document.getElementById('historicoFiltrosAlturaCss')){
 if(!document.getElementById('solicitadosPlanilhaReadonlyScript')){
   const script=document.createElement('script');
   script.id='solicitadosPlanilhaReadonlyScript';
-  script.src=`solicitados-planilha-readonly.js?v=3-${Date.now()}`;
+  script.src=`solicitados-planilha-readonly.js?v=4-${Date.now()}`;
   script.async=false;
   document.body.appendChild(script);
 }
