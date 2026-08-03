@@ -1,6 +1,6 @@
-const CACHE_NAME = 'transporte-heuro-command-clean-20260803-0820';
+const CACHE_NAME = 'transporte-heuro-date-time-final-20260803-1039';
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
@@ -9,12 +9,11 @@ self.addEventListener('activate', (event) => {
     const keys = await caches.keys();
     await Promise.all(keys.map((key) => caches.delete(key)));
     await self.clients.claim();
-
     const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     await Promise.all(clients.map((client) => {
       try {
         const url = new URL(client.url);
-        url.searchParams.set('appUpdate', '20260803-0820');
+        url.searchParams.set('appUpdate', '20260803-1039');
         return client.navigate(url.toString());
       } catch (_) {
         return Promise.resolve();
