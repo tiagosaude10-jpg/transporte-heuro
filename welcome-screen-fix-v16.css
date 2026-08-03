@@ -32,3 +32,19 @@
   object-fit:contain!important;
   object-position:center top!important;
 }
+
+/* Campos fixos de data e horário — estrutura definitiva no index.html. */
+.fixed-datetime-field{display:block!important;width:100%!important;min-width:0!important;margin:0 0 15px!important;box-sizing:border-box!important}
+.fixed-datetime-field>label{display:block!important;margin:0 0 7px!important;font-weight:700!important;color:#14233f!important}
+.fixed-datetime-control{position:relative!important;display:flex!important;align-items:center!important;width:100%!important;min-width:0!important;height:50px!important;margin:0!important;border:1px solid var(--border)!important;border-radius:12px!important;background:#fff!important;overflow:hidden!important;box-sizing:border-box!important}
+.fixed-datetime-control:focus-within{border-color:var(--primary)!important;box-shadow:0 0 0 3px rgba(11,95,165,.12)!important}
+.fixed-datetime-control input{display:block!important;width:100%!important;min-width:0!important;height:100%!important;margin:0!important;padding:0 104px 0 14px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;box-sizing:border-box!important;color:var(--text)!important;font:inherit!important;font-size:16px!important;line-height:normal!important;-webkit-appearance:none!important;appearance:none!important}
+.fixed-datetime-control input:focus{outline:none!important}
+.fixed-datetime-control input::-webkit-date-and-time-value{text-align:left!important}
+.fixed-datetime-control input::-webkit-calendar-picker-indicator{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;opacity:0!important;cursor:pointer!important}
+.fixed-datetime-clear,.fixed-datetime-picker{position:absolute!important;top:50%!important;transform:translateY(-50%)!important;display:grid!important;place-items:center!important;width:40px!important;height:40px!important;margin:0!important;padding:0!important;border:0!important;border-radius:10px!important;background:#fff!important;color:#687b96!important;z-index:5!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important}
+.fixed-datetime-clear{right:46px!important;font-size:32px!important;font-weight:300!important;line-height:1!important}
+.fixed-datetime-picker{right:4px!important}
+.fixed-datetime-picker svg{width:26px!important;height:26px!important;fill:none!important;stroke:currentColor!important;stroke-width:2!important;stroke-linecap:round!important;stroke-linejoin:round!important;pointer-events:none!important}
+.fixed-datetime-field>small{display:block!important;margin:7px 0 0!important;color:var(--muted)!important;font-size:12px!important;font-weight:400!important;line-height:1.4!important}
+@media(max-width:460px){.fixed-datetime-field{grid-column:auto!important}.fixed-datetime-control{height:50px!important}.fixed-datetime-control input{padding-left:14px!important;padding-right:96px!important}}
