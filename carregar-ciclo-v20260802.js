@@ -8,6 +8,15 @@ fetch(cycleUrl,{cache:'no-store'})
   .then(inject)
   .catch(error=>{console.error(error);alert('Não foi possível atualizar o módulo Transportes da equipe. Feche e abra o aplicativo novamente.')});
 
+// Ajuste exclusivo da tela Nova solicitação de transporte.
+if(!document.getElementById('requestFormEnquadramentoCss')){
+  const link=document.createElement('link');
+  link.id='requestFormEnquadramentoCss';
+  link.rel='stylesheet';
+  link.href=`request-form-enquadramento.css?v=1-${Date.now()}`;
+  document.head.appendChild(link);
+}
+
 // O arquivo antigo de ações rápidas também escuta o botão Agenda no document.
 // A agenda avançada precisa interceptar no window (etapa anterior da propagação),
 // evitando que a tela antiga abra e deixe a rolagem travada.
