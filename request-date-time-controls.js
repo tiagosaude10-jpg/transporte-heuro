@@ -1,43 +1,39 @@
 (()=>{
 'use strict';
 const $=id=>document.getElementById(id);
-const isoToBr=value=>{if(!value)return'';const [y,m,d]=String(value).split('-');return y&&m&&d?`${d}/${m}/${y}`:''};
-const brToIso=value=>{const digits=String(value||'').replace(/\D/g,'').slice(0,8);if(digits.length!==8)return'';const d=digits.slice(0,2),m=digits.slice(2,4),y=digits.slice(4,8);const date=new Date(`${y}-${m}-${d}T12:00:00`);if(Number.isNaN(date.getTime())||date.getFullYear()!==Number(y)||date.getMonth()+1!==Number(m)||date.getDate()!==Number(d))return'';return`${y}-${m}-${d}`};
-const maskDate=value=>{const d=String(value||'').replace(/\D/g,'').slice(0,8);return d.length<=2?d:d.length<=4?`${d.slice(0,2)}/${d.slice(2)}`:`${d.slice(0,2)}/${d.slice(2,4)}/${d.slice(4)}`};
-const maskTime=value=>{const d=String(value||'').replace(/\D/g,'').slice(0,4);return d.length<=2?d:`${d.slice(0,2)}:${d.slice(2)}`};
-const validTime=value=>{const m=String(value||'').match(/^(\d{2}):(\d{2})$/);return m&&Number(m[1])<24&&Number(m[2])<60?value:''};
-const calendarSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 8h16M5 4h14a1 1 0 0 1 1 1v15H4V5a1 1 0 0 1 1-1Zm3 8h3v3H8v-3Z"/></svg>';
+const calendarSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 9h16"/></svg>';
 const clockSvg='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-function openPicker(native){try{if(typeof native.showPicker==='function'){native.showPicker();return}}catch{}native.focus();native.click()}
-function resetExisting(native,label){
- const current=native.closest('.heuro-datetime-control');
- if(current){current.parentNode?.insertBefore(native,current);current.remove()}
- label.querySelectorAll('.heuro-datetime-control,.heuro-datetime-help,.heuro-datetime-clear,.heuro-datetime-picker,.heuro-datetime-text').forEach(el=>{if(el!==native)el.remove()});
- native.classList.remove('heuro-native-picker');
- delete native.dataset.enhanced;
+function addStyles(){
+ if(document.getElementById('request-date-time-style'))return;
+ const style=document.createElement('style');style.id='request-date-time-style';style.textContent=`
+ .rdt-field{display:block!important;width:100%!important;min-width:0!important}
+ .rdt-label{display:block;margin:0 0 8px;font-weight:700;color:#14233f}
+ .rdt-control{position:relative;width:100%;height:58px;border:1.5px solid #cbd7e7;border-radius:18px;background:#fff;overflow:hidden;box-sizing:border-box}
+ .rdt-control:focus-within{border-color:#1768ad;box-shadow:0 0 0 3px rgba(23,104,173,.12)}
+ .rdt-control input{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0 92px 0 20px!important;border:0!important;background:transparent!important;box-shadow:none!important;border-radius:0!important;box-sizing:border-box!important;font-size:1rem!important;color:#14233f!important;opacity:1!important;z-index:2!important;-webkit-appearance:none!important;appearance:none!important}
+ .rdt-control input:focus{outline:none!important}
+ .rdt-control input::-webkit-date-and-time-value{text-align:left}
+ .rdt-control input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;cursor:pointer}
+ .rdt-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:30px;height:30px;display:grid;place-items:center;color:#687b96;z-index:3;pointer-events:none}
+ .rdt-icon svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ .rdt-clear{position:absolute;right:50px;top:50%;transform:translateY(-50%);width:38px;height:38px;padding:0;border:0;background:#fff;color:#687b96;font-size:32px;line-height:1;z-index:5;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+ .rdt-help{display:block;margin:7px 0 0;color:#677791;font-size:.86rem;line-height:1.25}
+ @media(max-width:390px){.rdt-control{height:56px}.rdt-control input{padding-left:16px!important;padding-right:88px!important}.rdt-icon{right:9px}.rdt-clear{right:44px}}
+ `;document.head.appendChild(style)
 }
-function build(id,type,helper){
- const native=$(id);if(!native)return;
- const label=native.closest('label');if(!label)return;
- if(native.dataset.enhanced==='2'&&native.closest('.heuro-datetime-control'))return;
- resetExisting(native,label);
- native.dataset.enhanced='2';
- const wrapper=document.createElement('div');wrapper.className='heuro-datetime-control';
- const visible=document.createElement('input');visible.type='text';visible.className='heuro-datetime-text';visible.inputMode='numeric';visible.autocomplete='off';visible.placeholder=type==='date'?'DD/MM/AAAA':'HH:MM';visible.setAttribute('aria-label',type==='date'?'Digite a data':'Digite o horário');visible.value=type==='date'?isoToBr(native.value):native.value;
- const clear=document.createElement('button');clear.type='button';clear.className='heuro-datetime-clear';clear.textContent='×';clear.setAttribute('aria-label',type==='date'?'Apagar data':'Apagar horário');
- const picker=document.createElement('button');picker.type='button';picker.className='heuro-datetime-picker';picker.innerHTML=type==='date'?calendarSvg:clockSvg;picker.setAttribute('aria-label',type==='date'?'Abrir calendário':'Abrir relógio');
- native.classList.add('heuro-native-picker');
- native.parentNode.insertBefore(wrapper,native);
- wrapper.append(visible,clear,picker,native);
- const help=document.createElement('small');help.className='heuro-datetime-help';help.textContent=helper;wrapper.after(help);
- const syncVisible=()=>{visible.value=type==='date'?isoToBr(native.value):native.value};
- native.addEventListener('change',syncVisible);
- visible.addEventListener('input',()=>{visible.value=type==='date'?maskDate(visible.value):maskTime(visible.value);native.value=type==='date'?brToIso(visible.value):validTime(visible.value);native.dispatchEvent(new Event('input',{bubbles:true}))});
- visible.addEventListener('blur',()=>{if(visible.value&&!native.value)visible.value=''});
- clear.addEventListener('click',()=>{visible.value='';native.value='';native.dispatchEvent(new Event('change',{bubbles:true}));visible.focus()});
- picker.addEventListener('click',()=>openPicker(native));
+function build(id,labelText,type,helpText){
+ const input=$(id);if(!input||input.dataset.rdtReady==='1')return;
+ const oldLabel=input.closest('label');if(!oldLabel)return;
+ const wrapper=document.createElement('label');wrapper.className='rdt-field';wrapper.htmlFor=id;
+ const title=document.createElement('span');title.className='rdt-label';title.textContent=labelText;
+ const control=document.createElement('span');control.className='rdt-control';
+ input.type=type;input.dataset.rdtReady='1';input.setAttribute('aria-label',labelText);input.setAttribute('autocomplete','off');
+ const clear=document.createElement('button');clear.type='button';clear.className='rdt-clear';clear.textContent='×';clear.setAttribute('aria-label',`Limpar ${labelText.toLowerCase()}`);
+ clear.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))});
+ const visual=document.createElement('span');visual.className='rdt-icon';visual.innerHTML=type==='time'?clockSvg:calendarSvg;
+ const help=document.createElement('small');help.className='rdt-help';help.textContent=helpText;
+ control.append(input,clear,visual);wrapper.append(title,control,help);oldLabel.replaceWith(wrapper)
 }
-function install(){build('birthDateNew','date','Digite a data ou selecione no calendário');build('transportDateNew','date','Digite a data ou selecione no calendário');build('transportTimeNew','time','Digite o horário ou selecione no relógio')}
+function install(){addStyles();build('birthDate','Data de nascimento','date','Digite a data ou selecione no calendário');build('transportDate','Data do transporte','date','Digite a data ou selecione no calendário');build('transportTime','Horário previsto','time','Digite o horário ou selecione no relógio')}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
-new MutationObserver(()=>requestAnimationFrame(install)).observe(document.documentElement,{subtree:true,childList:true});
 })();
