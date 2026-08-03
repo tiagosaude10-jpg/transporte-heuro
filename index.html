@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b5fa5" />
   <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
   <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=16" />
+  <link rel="stylesheet" href="style.css?v=18" />
   <link rel="stylesheet" href="welcome-screen-fix-v16.css?v=2" />
   <title>Transporte HEURO</title>
 </head>
@@ -83,17 +83,96 @@
         <button id="settingsCard" class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Números do WhatsApp</small></button>
       </div>
 
-      <section id="requestView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Solicitação</span><h3>Nova solicitação</h3></div><button class="back-button" data-back>Voltar</button></div><form id="requestForm" class="request-form"><div class="form-grid"><label>Nome do paciente<input id="patient" required /></label><label>Data de nascimento<input id="birthDate" type="date" /></label><label>Setor de origem<select id="originSector" required><option value="">Selecione o setor</option><option>Sala Vermelha</option><option>Clínica Médica</option><option>Clínica Cirúrgica/Ortopédica</option><option>Clínica Geral</option><option>UTI</option><option>Centro Cirúrgico</option></select></label><div id="boxLocation" class="location-group hidden"><span class="group-label">Local de origem</span><div class="location-fields single-field"><label>Box<input id="boxNumber" inputmode="numeric" placeholder="Ex.: 03" /></label></div></div><div id="wardLocation" class="location-group"><span class="group-label">Local de origem</span><div class="location-fields"><label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label><label>Leito<input id="bed" placeholder="Ex.: 08" /></label></div></div><label>Unidade de destino<input id="destination" required /></label><label>Data do transporte<input id="transportDate" type="date" required /></label><label>Horário previsto<input id="transportTime" type="time" required /></label><label>Tipo de ambulância<select id="ambulanceType"><option>Suporte básico</option><option>UTI</option></select></label><label>Prioridade<select id="priority"><option>Programado</option><option>Urgente</option><option>Emergência</option></select></label><label>Oxigênio<select id="oxygen"><option>Não</option><option>Sim</option></select></label></div><label>Contato do setor solicitante<input id="contact" inputmode="tel" /></label><label>Observações<textarea id="notes" rows="4"></textarea></label><label>Documento da regulação<input id="attachment" type="file" accept=".pdf,image/*" /><small class="help">Nesta etapa, apenas o nome do documento fica registrado neste aparelho.</small></label><div class="action-row"><button class="primary-button" type="submit">Salvar solicitação</button></div></form></section>
+      <section id="requestView" class="card content-view hidden">
+        <div class="section-head"><div><span class="eyebrow dark">Solicitação</span><h3>Nova solicitação</h3></div><button class="back-button" data-back>Voltar</button></div>
+        <form id="requestForm" class="request-form">
+          <div class="form-grid">
+            <label>Nome do paciente<input id="patient" required /></label>
+            <div class="fixed-datetime-field">
+              <label for="birthDate">Data de nascimento</label>
+              <div class="fixed-datetime-control">
+                <input id="birthDate" type="date" aria-label="Data de nascimento" />
+                <button type="button" class="fixed-datetime-clear" data-clear-field="birthDate" aria-label="Limpar data de nascimento">×</button>
+                <button type="button" class="fixed-datetime-picker" data-open-picker="birthDate" aria-label="Abrir calendário">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 9h16"></path></svg>
+                </button>
+              </div>
+              <small>Digite a data ou selecione no calendário</small>
+            </div>
+            <label>Setor de origem<select id="originSector" required><option value="">Selecione o setor</option><option>Sala Vermelha</option><option>Clínica Médica</option><option>Clínica Cirúrgica/Ortopédica</option><option>Clínica Geral</option><option>UTI</option><option>Centro Cirúrgico</option></select></label>
+            <div id="boxLocation" class="location-group hidden"><span class="group-label">Local de origem</span><div class="location-fields single-field"><label>Box<input id="boxNumber" inputmode="numeric" placeholder="Ex.: 03" /></label></div></div>
+            <div id="wardLocation" class="location-group"><span class="group-label">Local de origem</span><div class="location-fields"><label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label><label>Leito<input id="bed" placeholder="Ex.: 08" /></label></div></div>
+            <label>Unidade de destino<input id="destination" required /></label>
+            <div class="fixed-datetime-field">
+              <label for="transportDate">Data do transporte</label>
+              <div class="fixed-datetime-control">
+                <input id="transportDate" type="date" required aria-label="Data do transporte" />
+                <button type="button" class="fixed-datetime-clear" data-clear-field="transportDate" aria-label="Limpar data do transporte">×</button>
+                <button type="button" class="fixed-datetime-picker" data-open-picker="transportDate" aria-label="Abrir calendário">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 9h16"></path></svg>
+                </button>
+              </div>
+              <small>Digite a data ou selecione no calendário</small>
+            </div>
+            <div class="fixed-datetime-field">
+              <label for="transportTime">Horário previsto</label>
+              <div class="fixed-datetime-control">
+                <input id="transportTime" type="time" required aria-label="Horário previsto" />
+                <button type="button" class="fixed-datetime-clear" data-clear-field="transportTime" aria-label="Limpar horário previsto">×</button>
+                <button type="button" class="fixed-datetime-picker" data-open-picker="transportTime" aria-label="Abrir relógio">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                </button>
+              </div>
+              <small>Digite o horário ou selecione no relógio</small>
+            </div>
+            <label>Tipo de ambulância<select id="ambulanceType"><option>Suporte básico</option><option>UTI</option></select></label>
+            <label>Prioridade<select id="priority"><option>Programado</option><option>Urgente</option><option>Emergência</option></select></label>
+            <label>Oxigênio<select id="oxygen"><option>Não</option><option>Sim</option></select></label>
+          </div>
+          <label>Contato do setor solicitante<input id="contact" inputmode="tel" /></label>
+          <label>Observações<textarea id="notes" rows="4"></textarea></label>
+          <label>Documento da regulação<input id="attachment" type="file" accept=".pdf,image/*" /><small class="help">Nesta etapa, apenas o nome do documento fica registrado neste aparelho.</small></label>
+          <div class="action-row"><button class="primary-button" type="submit">Salvar solicitação</button></div>
+        </form>
+      </section>
       <section id="listView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div><div id="requestList" class="request-list"></div></section>
       <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3><p>Autorize os cadastros enviados para aprovação.</p></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
       <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração administrativa</span><h3>Números do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>WhatsApp — Transporte básico<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" required /></label><p class="help">Informe somente números com DDD. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar números</button></form></section>
       <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
     </section>
   </main>
-  <script src="app.js?v=17"></script>
-  <script src="register-flow.js?v=17"></script>
-  <script src="request-date-time-controls.js?v=5"></script>
+  <script src="app.js?v=18"></script>
+  <script src="register-flow.js?v=18"></script>
   <script src="whatsapp-routing.js?v=3"></script>
-  <script src="resumo-dia-hotspots.js?v=3"></script>
+  <script>
+    (() => {
+      function openPicker(input) {
+        input.focus({ preventScroll: true });
+        if (typeof input.showPicker === 'function') {
+          try { input.showPicker(); return; } catch (_) {}
+        }
+        input.click();
+      }
+      document.addEventListener('click', (event) => {
+        const clearButton = event.target.closest('[data-clear-field]');
+        if (clearButton) {
+          event.preventDefault();
+          const input = document.getElementById(clearButton.dataset.clearField);
+          if (input) {
+            input.value = '';
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          return;
+        }
+        const pickerButton = event.target.closest('[data-open-picker]');
+        if (pickerButton) {
+          event.preventDefault();
+          const input = document.getElementById(pickerButton.dataset.openPicker);
+          if (input) openPicker(input);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
