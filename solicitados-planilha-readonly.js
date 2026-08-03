@@ -1,10 +1,8 @@
 (()=>{
 'use strict';
 
-const HOTSPOT_ID='solicitadosBottomHotspot';
-
 function openRequestedReadOnly(){
-  const pendingButton=document.getElementById('cmdPending');
+  const pendingButton=document.getElementById('cmdPending')||document.getElementById('v2Pending');
   if(pendingButton){
     pendingButton.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));
     return;
@@ -14,31 +12,20 @@ function openRequestedReadOnly(){
   }));
 }
 
-function installHotspot(){
-  const frame=document.querySelector('.command-image-frame');
-  if(!frame||document.getElementById(HOTSPOT_ID))return;
-  const button=document.createElement('button');
-  button.id=HOTSPOT_ID;
-  button.type='button';
-  button.setAttribute('aria-label','Abrir planilha dos solicitados');
-  button.style.cssText='position:absolute;left:20%;bottom:0;width:22%;height:8.5%;z-index:80;margin:0;padding:0;border:0;background:transparent;appearance:none;-webkit-appearance:none;touch-action:manipulation;cursor:pointer;';
+function bindRealButton(){
+  const button=document.getElementById('v2Transport');
+  if(!button||button.dataset.solicitadosBound==='1')return;
+  button.dataset.solicitadosBound='1';
+  button.style.pointerEvents='auto';
+  button.style.zIndex='100';
   button.addEventListener('click',event=>{
     event.preventDefault();
-    event.stopPropagation();
+    event.stopImmediatePropagation();
     openRequestedReadOnly();
-  });
-  frame.appendChild(button);
+  },true);
 }
 
-window.addEventListener('click',event=>{
-  const target=event.target.closest('#cmdTransport,#transportNavCard,[aria-label*="Solicitados" i],[title*="Solicitados" i]');
-  if(!target)return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  openRequestedReadOnly();
-},true);
-
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installHotspot,{once:true});
-else installHotspot();
-new MutationObserver(installHotspot).observe(document.documentElement,{subtree:true,childList:true});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindRealButton,{once:true});
+else bindRealButton();
+new MutationObserver(bindRealButton).observe(document.documentElement,{subtree:true,childList:true});
 })();
