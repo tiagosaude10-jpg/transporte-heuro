@@ -1,129 +1,133 @@
 (() => {
   'use strict';
 
-  const MARK = 'data-resumo-hotspot-ready';
+  let lastActivation = 0;
 
-  function openList() {
+  function showViewDirect(viewId) {
+    const home = document.getElementById('homeScreen');
     const dashboard = document.getElementById('dashboard');
-    const listView = document.getElementById('listView');
-    if (!listView) return;
+    const target = document.getElementById(viewId);
+    if (!home || !target) return false;
+
+    document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
+    home.classList.add('active');
 
     dashboard?.classList.add('hidden');
     document.querySelectorAll('#homeScreen > .content-view').forEach((view) => view.classList.add('hidden'));
-    listView.classList.remove('hidden');
-    try {
-      if (typeof window.renderList === 'function') window.renderList();
-      else if (typeof renderList === 'function') renderList();
-    } catch (_) {}
+    target.classList.remove('hidden');
+
+    if (viewId === 'listView') {
+      try {
+        if (typeof window.renderList === 'function') window.renderList();
+        else if (typeof renderList === 'function') renderList();
+      } catch (error) {
+        console.error('Falha ao atualizar a lista de solicitações:', error);
+      }
+    }
+
+    window.scrollTo(0, 0);
+    return true;
+  }
+
+  function showDashboard() {
+    const home = document.getElementById('homeScreen');
+    const dashboard = document.getElementById('dashboard');
+    if (!home || !dashboard) return;
+    document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
+    home.classList.add('active');
+    document.querySelectorAll('#homeScreen > .content-view').forEach((view) => view.classList.add('hidden'));
+    dashboard.classList.remove('hidden');
     window.scrollTo(0, 0);
   }
 
-  function activate(label) {
-    const text = String(label || '').trim().toLowerCase();
+  function activateAction(action) {
+    const now = Date.now();
+    if (now - lastActivation < 350) return;
+    lastActivation = now;
 
-    if (text.includes('confirm')) {
-      const agenda = document.querySelector('[data-home-action="agenda"], #agendaCardVisual, #cmdAgenda');
-      if (agenda) agenda.click();
-      else openList();
-      return;
+    switch (action) {
+      case 'home':
+        showDashboard();
+        break;
+      case 'confirmed':
+      case 'analysis':
+      case 'pending':
+      case 'completed':
+      case 'solicitados':
+        showViewDirect('listView');
+        break;
+      case 'notifications':
+        alert('Central de notificações em estruturação.');
+        break;
+      case 'profile': {
+        let session = null;
+        try { session = JSON.parse(sessionStorage.getItem('heuroSession') || 'null'); } catch (_) {}
+        alert(session ? `${session.name}\n${session.profile}` : 'Perfil do usuário');
+        break;
+      }
+      case 'more': {
+        let session = null;
+        try { session = JSON.parse(sessionStorage.getItem('heuroSession') || 'null'); } catch (_) {}
+        if (session?.profile === 'administrador') showViewDirect('usersView');
+        else alert('Esta área é exclusiva para administradores.');
+        break;
+      }
     }
-
-    if (text.includes('conclu')) {
-      const history = document.querySelector('[data-home-action="history"], #historyCardVisual, #cmdHistory');
-      if (history) history.click();
-      else openList();
-      return;
-    }
-
-    if (text.includes('pendent')) {
-      const pending = document.querySelector('[data-home-action="pending"], #pendingCardVisual, #cmdPending');
-      if (pending) pending.click();
-      else openList();
-      return;
-    }
-
-    // “Em análise” / “Solicitados”: consulta da planilha sem alterar status.
-    openList();
   }
 
-  function makeClickable(item) {
-    if (!item || item.hasAttribute(MARK)) return;
-    item.setAttribute(MARK, '1');
-    item.style.position = 'relative';
-
-    const label = item.querySelector('span')?.textContent || item.textContent || '';
-    const overlay = document.createElement('button');
-    overlay.type = 'button';
-    overlay.className = 'resumo-dia-hotspot';
-    overlay.setAttribute('aria-label', `Abrir ${label.trim()}`);
-    overlay.style.cssText = [
-      'position:absolute',
-      'inset:0',
-      'width:100%',
-      'height:100%',
-      'z-index:50',
-      'margin:0',
-      'padding:0',
-      'border:0',
-      'border-radius:inherit',
-      'background:rgba(0,0,0,0.001)',
-      'appearance:none',
-      '-webkit-appearance:none',
-      'touch-action:manipulation',
-      '-webkit-tap-highlight-color:transparent',
-      'pointer-events:auto'
-    ].join(';');
-
-    const run = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
-      activate(label);
-    };
-
-    overlay.addEventListener('click', run, true);
-    overlay.addEventListener('pointerup', run, true);
-    overlay.addEventListener('touchend', run, { capture: true, passive: false });
-    item.appendChild(overlay);
+  function summaryAction(element) {
+    const item = element?.closest?.('.summary-grid .summary-item');
+    if (!item) return null;
+    const items = [...item.parentElement.querySelectorAll('.summary-item')];
+    return ['confirmed', 'analysis', 'pending', 'completed'][items.indexOf(item)] || null;
   }
 
-  function bindSummaryCards() {
-    document.querySelectorAll('.summary-grid .summary-item').forEach(makeClickable);
+  function bottomAction(element) {
+    const button = element?.closest?.('#bottomNav button');
+    if (!button) return null;
+    const buttons = [...button.parentElement.querySelectorAll(':scope > button')];
+    return ['home', 'solicitados', 'notifications', 'profile', 'more'][buttons.indexOf(button)] || null;
   }
 
-  function bindSolicitadosBottom() {
+  function resolveAction(target) {
+    return summaryAction(target) || bottomAction(target);
+  }
+
+  function route(event) {
+    const action = resolveAction(event.target);
+    if (!action) return;
+    event.preventDefault();
+    event.stopPropagation();
+    if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+    activateAction(action);
+  }
+
+  document.addEventListener('pointerup', route, true);
+  document.addEventListener('click', route, true);
+  document.addEventListener('touchend', route, { capture: true, passive: false });
+
+  function prepare() {
+    document.querySelectorAll('.summary-grid .summary-item').forEach((item, index) => {
+      item.setAttribute('role', 'button');
+      item.setAttribute('tabindex', '0');
+      item.style.cursor = 'pointer';
+      item.style.touchAction = 'manipulation';
+      item.dataset.summaryAction = ['confirmed', 'analysis', 'pending', 'completed'][index] || '';
+    });
+
     const nav = document.getElementById('bottomNav');
-    if (!nav) return;
-    const button = nav.querySelector('[data-nav="solicitados"], [data-nav="transports"]') || nav.querySelectorAll('button')[1];
-    if (!button || button.dataset.overlaySolicitados === '1') return;
-
-    button.dataset.overlaySolicitados = '1';
-    button.dataset.nav = 'solicitados';
-    button.style.position = 'relative';
-
-    const overlay = document.createElement('button');
-    overlay.type = 'button';
-    overlay.setAttribute('aria-label', 'Abrir planilha dos solicitados');
-    overlay.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:60;margin:0;padding:0;border:0;background:rgba(0,0,0,0.001);appearance:none;-webkit-appearance:none;touch-action:manipulation;';
-    const run = (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
-      openList();
-    };
-    overlay.addEventListener('click', run, true);
-    overlay.addEventListener('pointerup', run, true);
-    overlay.addEventListener('touchend', run, { capture: true, passive: false });
-    button.appendChild(overlay);
+    const buttons = nav ? [...nav.querySelectorAll(':scope > button')] : [];
+    if (buttons[1]) {
+      buttons[1].dataset.nav = 'solicitados';
+      buttons[1].setAttribute('aria-label', 'Abrir planilha dos solicitados');
+      buttons[1].style.touchAction = 'manipulation';
+      const textNode = [...buttons[1].childNodes].find((node) => node.nodeType === Node.TEXT_NODE);
+      if (textNode) textNode.nodeValue = 'Solicitados';
+    }
   }
 
-  function install() {
-    bindSummaryCards();
-    bindSolicitadosBottom();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepare, { once: true });
+  else prepare();
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, { once: true });
-  else install();
-
-  new MutationObserver(install).observe(document.documentElement, { childList: true, subtree: true });
+  new MutationObserver(prepare).observe(document.documentElement, { childList: true, subtree: true });
 })();
