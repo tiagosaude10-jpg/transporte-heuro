@@ -1,10 +1,10 @@
 {
   "name": "Transporte HEURO",
   "short_name": "HEURO Transporte",
-  "description": "Aplicativo de agendamento de transporte do HEURO",
-  "start_url": "./?build=20260803-1246",
+  "description": "Aplicativo de solicitação e acompanhamento de transportes do HEURO",
+  "id": "/transporte-heuro/",
+  "start_url": "./",
   "scope": "./",
-  "id": "transporte-heuro-v20260803-1246",
   "display": "standalone",
   "background_color": "#071b4d",
   "theme_color": "#071b4d",
