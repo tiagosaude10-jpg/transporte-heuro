@@ -2,7 +2,7 @@
 'use strict';
 const inject=code=>{const s=document.createElement('script');s.textContent=code;document.body.appendChild(s)};
 
-const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0337-${Date.now()}`;
+const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0532-${Date.now()}`;
 fetch(cycleUrl,{cache:'no-store'})
   .then(r=>{if(!r.ok)throw new Error('Falha ao carregar módulo da equipe');return r.text()})
   .then(inject)
@@ -69,5 +69,12 @@ if(!document.getElementById('historicoFiltrosAlturaCss')){
   link.rel='stylesheet';
   link.href=`historico-filtros-altura.css?v=1-${Date.now()}`;
   document.head.appendChild(link);
+}
+if(!document.getElementById('solicitadosPlanilhaReadonlyScript')){
+  const script=document.createElement('script');
+  script.id='solicitadosPlanilhaReadonlyScript';
+  script.src=`solicitados-planilha-readonly.js?v=1-${Date.now()}`;
+  script.async=false;
+  document.body.appendChild(script);
 }
 })();
