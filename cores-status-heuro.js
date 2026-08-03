@@ -55,3 +55,25 @@ new MutationObserver(paintDynamic).observe(document.documentElement,{subtree:tru
 window.addEventListener('pageshow',paintDynamic);
 paintDynamic();
 })();
+
+// Ajuste restrito à tela de login: estende e abaixa somente essa arte para cobrir a faixa branca inferior.
+(()=>{
+'use strict';
+const ID='heuro-login-abaixar-v1';
+if(document.getElementById(ID))return;
+const style=document.createElement('style');
+style.id=ID;
+style.textContent=`
+#loginNew.active{
+  top:0!important;
+  bottom:-6dvh!important;
+  height:106dvh!important;
+  min-height:106dvh!important;
+}
+#loginNew.active>.login-wrap{
+  height:106dvh!important;
+  min-height:106dvh!important;
+}
+`;
+document.head.appendChild(style);
+})();
