@@ -6,21 +6,13 @@
   if (!dashboard) return;
 
   function openViewDirect(viewId) {
-    try {
-      if (typeof window.showView === 'function') {
-        window.showView(viewId);
-        return;
-      }
-    } catch (_) {}
-
+    const target = document.getElementById(viewId);
+    if (!target) return;
     dashboard.classList.add('hidden');
     document.querySelectorAll('#homeScreen > .content-view').forEach((view) => view.classList.add('hidden'));
-    const target = document.getElementById(viewId);
-    if (target) {
-      target.classList.remove('hidden');
-      if (viewId === 'listView' && typeof window.renderList === 'function') window.renderList();
-      window.scrollTo(0, 0);
-    }
+    target.classList.remove('hidden');
+    try { if (viewId === 'listView' && typeof renderList === 'function') renderList(); } catch (_) {}
+    window.scrollTo(0, 0);
   }
 
   function openDashboardDirect() {
@@ -29,10 +21,19 @@
     window.scrollTo(0, 0);
   }
 
+  function openSolicitados(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (typeof event.stopImmediatePropagation === 'function') event.stopImmediatePropagation();
+    }
+    openViewDirect('listView');
+  }
+
   dashboard.className = 'command-image-dashboard';
   dashboard.innerHTML = `
     <div class="command-image-frame" aria-label="Página de comando do Transporte HEURO">
-      <img class="command-image" src="${COMMAND_IMAGE}?v=20260803-0625" alt="Página de comando do aplicativo Transporte HEURO" decoding="async" fetchpriority="high" />
+      <img class="command-image" src="${COMMAND_IMAGE}?v=20260803-0630" alt="Página de comando do aplicativo Transporte HEURO" decoding="async" fetchpriority="high" />
       <button id="commandBell" class="command-hotspot hotspot-bell" type="button" aria-label="Abrir notificações"></button>
       <button id="commandLogout" class="command-hotspot hotspot-logout" type="button" aria-label="Sair do aplicativo"></button>
       <button id="newRequestCardVisual" class="command-hotspot hotspot-new-request" type="button" aria-label="Nova solicitação de transporte"></button>
@@ -55,9 +56,8 @@
     #dashboard.command-image-dashboard{display:block;width:100%;margin:0;padding:0;background:#fff}
     #dashboard.command-image-dashboard.hidden{display:none!important}
     .command-image-frame{position:relative;width:100%;line-height:0;background:#fff;overflow:hidden}
-    .command-image{display:block;width:100%;height:auto;margin:0;user-select:none;-webkit-user-drag:none}
-    .command-hotspot{position:absolute;z-index:30;margin:0;padding:0;border:0;border-radius:14px;background:transparent;appearance:none;-webkit-appearance:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-    .command-hotspot:focus-visible{outline:3px solid rgba(11,95,165,.55);outline-offset:-3px}
+    .command-image{display:block;width:100%;height:auto;margin:0;user-select:none;-webkit-user-drag:none;pointer-events:none}
+    .command-hotspot{position:absolute!important;z-index:100!important;margin:0!important;padding:0!important;border:0!important;border-radius:14px!important;background:rgba(0,0,0,0.001)!important;appearance:none!important;-webkit-appearance:none!important;touch-action:manipulation!important;-webkit-tap-highlight-color:transparent!important;pointer-events:auto!important}
     .hotspot-bell{left:63.5%;top:2.7%;width:10%;height:5.2%}
     .hotspot-logout{left:76%;top:2.4%;width:20%;height:5.8%}
     .hotspot-new-request{left:4.5%;top:29%;width:91%;height:10.8%}
@@ -65,11 +65,11 @@
     .hotspot-pending{left:4.5%;top:55.8%;width:91%;height:6.7%}
     .hotspot-agenda{left:4.5%;top:63%;width:91%;height:6.8%}
     .hotspot-history{left:4.5%;top:70.3%;width:91%;height:6.8%}
-    .hotspot-home{left:2.5%;top:92.4%;width:18.5%;height:7.6%}
-    .hotspot-transport{left:20.5%;top:92.4%;width:20.5%;height:7.6%}
-    .hotspot-notifications{left:40.5%;top:92.4%;width:21%;height:7.6%}
-    .hotspot-profile{left:61%;top:92.4%;width:18.5%;height:7.6%}
-    .hotspot-more{left:79%;top:92.4%;width:18.5%;height:7.6%}
+    .hotspot-home{left:0;top:90.8%;width:21%;height:9.2%}
+    .hotspot-transport{left:18%;top:90.8%;width:25%;height:9.2%}
+    .hotspot-notifications{left:40.5%;top:90.8%;width:21%;height:9.2%}
+    .hotspot-profile{left:61%;top:90.8%;width:18.5%;height:9.2%}
+    .hotspot-more{left:79%;top:90.8%;width:21%;height:9.2%}
     #homeScreen > .content-view{margin:18px}
   `;
   document.getElementById(style.id)?.remove();
@@ -80,11 +80,14 @@
   document.getElementById('pendingCardVisual')?.addEventListener('click', () => openViewDirect('listView'));
   document.getElementById('agendaCardVisual')?.addEventListener('click', () => openViewDirect('listView'));
   document.getElementById('historyCardVisual')?.addEventListener('click', () => openViewDirect('listView'));
-  document.getElementById('solicitadosNavCard')?.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    openViewDirect('listView');
-  });
+
+  const solicitados = document.getElementById('solicitadosNavCard');
+  if (solicitados) {
+    solicitados.onclick = openSolicitados;
+    solicitados.addEventListener('pointerup', openSolicitados, true);
+    solicitados.addEventListener('touchend', openSolicitados, { capture: true, passive: false });
+  }
+
   document.getElementById('homeNavCard')?.addEventListener('click', openDashboardDirect);
   document.getElementById('commandBell')?.addEventListener('click', () => openViewDirect('listView'));
   document.getElementById('notificationsNavCard')?.addEventListener('click', () => openViewDirect('listView'));
