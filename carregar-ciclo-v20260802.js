@@ -2,24 +2,30 @@
 'use strict';
 const inject=code=>{const s=document.createElement('script');s.textContent=code;document.body.appendChild(s)};
 
-const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0229-${Date.now()}`;
+const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0307-${Date.now()}`;
 fetch(cycleUrl,{cache:'no-store'})
   .then(r=>{if(!r.ok)throw new Error('Falha ao carregar módulo da equipe');return r.text()})
   .then(inject)
   .catch(error=>{console.error(error);alert('Não foi possível atualizar o módulo Transportes da equipe. Feche e abra o aplicativo novamente.')});
 
-// Ajuste exclusivo da tela Nova solicitação de transporte.
+// Ajustes exclusivos da tela Nova solicitação de transporte.
 if(!document.getElementById('requestFormEnquadramentoCss')){
   const link=document.createElement('link');
   link.id='requestFormEnquadramentoCss';
   link.rel='stylesheet';
-  link.href=`request-form-enquadramento.css?v=1-${Date.now()}`;
+  link.href=`request-form-enquadramento.css?v=4-${Date.now()}`;
   document.head.appendChild(link);
+}
+if(!document.getElementById('requestDateTimeControlsScript')){
+  const script=document.createElement('script');
+  script.id='requestDateTimeControlsScript';
+  script.src=`request-date-time-controls.js?v=1-${Date.now()}`;
+  script.async=false;
+  document.body.appendChild(script);
 }
 
 // O arquivo antigo de ações rápidas também escuta o botão Agenda no document.
-// A agenda avançada precisa interceptar no window (etapa anterior da propagação),
-// evitando que a tela antiga abra e deixe a rolagem travada.
+// A agenda avançada intercepta antes para impedir a abertura da tela antiga.
 if(!document.getElementById('agendaTransporteAvancadaScript')){
   const marker=document.createElement('meta');
   marker.id='agendaTransporteAvancadaScript';
