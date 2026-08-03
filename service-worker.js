@@ -1,4 +1,4 @@
-const CACHE_NAME = 'transporte-heuro-date-time-final-20260803-1039';
+const CACHE_NAME = 'transporte-heuro-fixed-controls-20260803-1049';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -13,7 +13,7 @@ self.addEventListener('activate', (event) => {
     await Promise.all(clients.map((client) => {
       try {
         const url = new URL(client.url);
-        url.searchParams.set('appUpdate', '20260803-1039');
+        url.searchParams.set('appUpdate', '20260803-1049');
         return client.navigate(url.toString());
       } catch (_) {
         return Promise.resolve();
