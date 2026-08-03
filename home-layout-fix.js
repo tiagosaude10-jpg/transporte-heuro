@@ -8,6 +8,15 @@
   function openViewDirect(viewId) {
     const target = document.getElementById(viewId);
     if (!target) return;
+
+    try {
+      if (typeof window.showView === 'function') {
+        window.showView(viewId);
+        window.scrollTo(0, 0);
+        return;
+      }
+    } catch (_) {}
+
     dashboard.classList.add('hidden');
     document.querySelectorAll('#homeScreen > .content-view').forEach((view) => view.classList.add('hidden'));
     target.classList.remove('hidden');
@@ -30,10 +39,30 @@
     openViewDirect('listView');
   }
 
+  function prepareRealBottomButton() {
+    const nav = document.getElementById('bottomNav');
+    if (!nav) return;
+
+    const button = nav.querySelector('[data-nav="transports"], [data-nav="solicitados"]') || nav.querySelectorAll('button')[1];
+    if (!button) return;
+
+    button.dataset.nav = 'solicitados';
+    button.setAttribute('aria-label', 'Abrir planilha dos solicitados');
+    const textNodes = [...button.childNodes].filter((node) => node.nodeType === Node.TEXT_NODE);
+    if (textNodes.length) textNodes[textNodes.length - 1].nodeValue = 'Solicitados';
+    else button.appendChild(document.createTextNode('Solicitados'));
+
+    if (button.dataset.solicitadosBound === '1') return;
+    button.dataset.solicitadosBound = '1';
+    button.addEventListener('click', openSolicitados, true);
+    button.addEventListener('pointerup', openSolicitados, true);
+    button.addEventListener('touchend', openSolicitados, { capture: true, passive: false });
+  }
+
   dashboard.className = 'command-image-dashboard';
   dashboard.innerHTML = `
     <div class="command-image-frame" aria-label="Página de comando do Transporte HEURO">
-      <img class="command-image" src="${COMMAND_IMAGE}?v=20260803-0630" alt="Página de comando do aplicativo Transporte HEURO" decoding="async" fetchpriority="high" />
+      <img class="command-image" src="${COMMAND_IMAGE}?v=20260803-0637" alt="Página de comando do aplicativo Transporte HEURO" decoding="async" fetchpriority="high" />
       <button id="commandBell" class="command-hotspot hotspot-bell" type="button" aria-label="Abrir notificações"></button>
       <button id="commandLogout" class="command-hotspot hotspot-logout" type="button" aria-label="Sair do aplicativo"></button>
       <button id="newRequestCardVisual" class="command-hotspot hotspot-new-request" type="button" aria-label="Nova solicitação de transporte"></button>
@@ -71,6 +100,7 @@
     .hotspot-profile{left:61%;top:90.8%;width:18.5%;height:9.2%}
     .hotspot-more{left:79%;top:90.8%;width:21%;height:9.2%}
     #homeScreen > .content-view{margin:18px}
+    #bottomNav [data-nav="solicitados"]{touch-action:manipulation!important;pointer-events:auto!important;min-height:54px!important}
   `;
   document.getElementById(style.id)?.remove();
   document.head.appendChild(style);
@@ -88,6 +118,11 @@
     solicitados.addEventListener('touchend', openSolicitados, { capture: true, passive: false });
   }
 
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('#bottomNav [data-nav="solicitados"], #bottomNav [data-nav="transports"]');
+    if (button) openSolicitados(event);
+  }, true);
+
   document.getElementById('homeNavCard')?.addEventListener('click', openDashboardDirect);
   document.getElementById('commandBell')?.addEventListener('click', () => openViewDirect('listView'));
   document.getElementById('notificationsNavCard')?.addEventListener('click', () => openViewDirect('listView'));
@@ -103,4 +138,7 @@
     if (active?.profile === 'administrador') openViewDirect('usersView');
     else alert('Esta área é exclusiva para administradores.');
   });
+
+  prepareRealBottomButton();
+  new MutationObserver(prepareRealBottomButton).observe(document.documentElement, { childList: true, subtree: true });
 })();
