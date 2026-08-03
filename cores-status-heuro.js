@@ -56,10 +56,10 @@ window.addEventListener('pageshow',paintDynamic);
 paintDynamic();
 })();
 
-// Enquadramento proporcional aplicado exclusivamente à tela de login.
+// Enquadramento sem deformação, restrito exclusivamente à tela de login.
 (()=>{
 'use strict';
-const ID='heuro-login-enquadramento-v2';
+const ID='heuro-login-enquadramento-v3';
 if(document.getElementById(ID))return;
 const style=document.createElement('style');
 style.id=ID;
@@ -69,6 +69,7 @@ style.textContent=`
   width:100vw!important;
   height:100dvh!important;
   min-height:100dvh!important;
+  margin:0!important;
   padding:0!important;
   overflow:hidden!important;
   background:#063b91!important;
@@ -76,14 +77,13 @@ style.textContent=`
 #loginNew.active>.login-wrap{
   position:relative!important;
   width:100vw!important;
-  height:auto!important;
-  min-height:0!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
   max-width:none!important;
-  aspect-ratio:941 / 1672!important;
-  margin:12px auto 0!important;
+  margin:0!important;
   padding:0!important;
   background-position:center top!important;
-  background-size:100% 100%!important;
+  background-size:auto 100%!important;
   background-repeat:no-repeat!important;
   background-color:#063b91!important;
 }
