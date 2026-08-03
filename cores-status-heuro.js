@@ -56,15 +56,17 @@ window.addEventListener('pageshow',paintDynamic);
 paintDynamic();
 })();
 
-// Enquadramento sem deformação, restrito exclusivamente à tela de login.
+// Enquadramento e acabamento inferior restritos exclusivamente à tela de login.
 (()=>{
 'use strict';
-const ID='heuro-login-enquadramento-v3';
+const ID='heuro-login-enquadramento-v4';
 if(document.getElementById(ID))return;
+const IMAGE='https://raw.githubusercontent.com/tiagosaude10-jpg/transporte-heuro/f5ebf875b865ab126728eea9b05921184ea98fa6/610B133E-A6BC-4292-86A8-5D5DB885BF47.png';
 const style=document.createElement('style');
 style.id=ID;
 style.textContent=`
 #loginNew.active{
+  position:fixed!important;
   inset:0!important;
   width:100vw!important;
   height:100dvh!important;
@@ -72,10 +74,11 @@ style.textContent=`
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
-  background:#063b91!important;
+  background:#071a38!important;
 }
 #loginNew.active>.login-wrap{
   position:relative!important;
+  z-index:1!important;
   width:100vw!important;
   height:100dvh!important;
   min-height:100dvh!important;
@@ -85,7 +88,21 @@ style.textContent=`
   background-position:center top!important;
   background-size:auto 100%!important;
   background-repeat:no-repeat!important;
-  background-color:#063b91!important;
+  background-color:transparent!important;
+}
+#loginNew.active::after{
+  content:''!important;
+  position:fixed!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  z-index:2!important;
+  height:calc(env(safe-area-inset-bottom,0px) + 72px)!important;
+  pointer-events:none!important;
+  background-image:url('${IMAGE}')!important;
+  background-repeat:no-repeat!important;
+  background-size:100vw auto!important;
+  background-position:center bottom!important;
 }
 `;
 document.head.appendChild(style);
