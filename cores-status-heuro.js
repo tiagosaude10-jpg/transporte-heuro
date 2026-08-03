@@ -56,23 +56,36 @@ window.addEventListener('pageshow',paintDynamic);
 paintDynamic();
 })();
 
-// Ajuste restrito à tela de login: estende e abaixa somente essa arte para cobrir a faixa branca inferior.
+// Enquadramento proporcional aplicado exclusivamente à tela de login.
 (()=>{
 'use strict';
-const ID='heuro-login-abaixar-v1';
+const ID='heuro-login-enquadramento-v2';
 if(document.getElementById(ID))return;
 const style=document.createElement('style');
 style.id=ID;
 style.textContent=`
 #loginNew.active{
-  top:0!important;
-  bottom:-6dvh!important;
-  height:106dvh!important;
-  min-height:106dvh!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  padding:0!important;
+  overflow:hidden!important;
+  background:#063b91!important;
 }
 #loginNew.active>.login-wrap{
-  height:106dvh!important;
-  min-height:106dvh!important;
+  position:relative!important;
+  width:100vw!important;
+  height:auto!important;
+  min-height:0!important;
+  max-width:none!important;
+  aspect-ratio:941 / 1672!important;
+  margin:12px auto 0!important;
+  padding:0!important;
+  background-position:center top!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+  background-color:#063b91!important;
 }
 `;
 document.head.appendChild(style);
