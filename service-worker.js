@@ -1,4 +1,4 @@
-const CACHE_NAME = 'transporte-heuro-reset-v1';
+const CACHE_NAME = 'transporte-heuro-solicitados-fix-20260803-0630';
 
 self.addEventListener('install', event => {
   self.skipWaiting();
