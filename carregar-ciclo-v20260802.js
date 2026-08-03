@@ -2,7 +2,7 @@
 'use strict';
 const inject=code=>{const s=document.createElement('script');s.textContent=code;document.body.appendChild(s)};
 
-const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0538-${Date.now()}`;
+const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0545-${Date.now()}`;
 fetch(cycleUrl,{cache:'no-store'})
   .then(r=>{if(!r.ok)throw new Error('Falha ao carregar módulo da equipe');return r.text()})
   .then(inject)
@@ -12,13 +12,13 @@ if(!document.getElementById('requestFormEnquadramentoCss')){
   const link=document.createElement('link');
   link.id='requestFormEnquadramentoCss';
   link.rel='stylesheet';
-  link.href=`request-form-enquadramento.css?v=4-${Date.now()}`;
+  link.href=`request-form-enquadramento.css?v=5-${Date.now()}`;
   document.head.appendChild(link);
 }
 if(!document.getElementById('requestDateTimeControlsScript')){
   const script=document.createElement('script');
   script.id='requestDateTimeControlsScript';
-  script.src=`request-date-time-controls.js?v=1-${Date.now()}`;
+  script.src=`request-date-time-controls.js?v=2-${Date.now()}`;
   script.async=false;
   document.body.appendChild(script);
 }
