@@ -56,15 +56,21 @@ window.addEventListener('pageshow',paintDynamic);
 paintDynamic();
 })();
 
-// Enquadramento e acabamento inferior restritos exclusivamente à tela de login.
+// Acabamento inferior aplicado somente enquanto a tela de login estiver ativa.
 (()=>{
 'use strict';
-const ID='heuro-login-enquadramento-v4';
-if(document.getElementById(ID))return;
+const STYLE_ID='heuro-login-acabamento-v5';
+const ACTIVE_CLASS='heuro-login-safe-area';
 const IMAGE='https://raw.githubusercontent.com/tiagosaude10-jpg/transporte-heuro/f5ebf875b865ab126728eea9b05921184ea98fa6/610B133E-A6BC-4292-86A8-5D5DB885BF47.png';
-const style=document.createElement('style');
-style.id=ID;
-style.textContent=`
+
+if(!document.getElementById(STYLE_ID)){
+  const style=document.createElement('style');
+  style.id=STYLE_ID;
+  style.textContent=`
+html.${ACTIVE_CLASS},
+html.${ACTIVE_CLASS} body{
+  background:#071a38!important;
+}
 #loginNew.active{
   position:fixed!important;
   inset:0!important;
@@ -78,7 +84,6 @@ style.textContent=`
 }
 #loginNew.active>.login-wrap{
   position:relative!important;
-  z-index:1!important;
   width:100vw!important;
   height:100dvh!important;
   min-height:100dvh!important;
@@ -88,7 +93,7 @@ style.textContent=`
   background-position:center top!important;
   background-size:auto 100%!important;
   background-repeat:no-repeat!important;
-  background-color:transparent!important;
+  background-color:#071a38!important;
 }
 #loginNew.active::after{
   content:''!important;
@@ -96,14 +101,29 @@ style.textContent=`
   left:0!important;
   right:0!important;
   bottom:0!important;
-  z-index:2!important;
-  height:calc(env(safe-area-inset-bottom,0px) + 72px)!important;
+  z-index:10001!important;
+  height:max(46px,env(safe-area-inset-bottom,0px))!important;
   pointer-events:none!important;
   background-image:url('${IMAGE}')!important;
   background-repeat:no-repeat!important;
-  background-size:100vw auto!important;
+  background-size:auto 100dvh!important;
   background-position:center bottom!important;
+  background-color:#071a38!important;
 }
 `;
-document.head.appendChild(style);
+  document.head.appendChild(style);
+}
+
+function syncLoginSafeArea(){
+  const active=document.getElementById('loginNew')?.classList.contains('active');
+  document.documentElement.classList.toggle(ACTIVE_CLASS,Boolean(active));
+}
+
+new MutationObserver(syncLoginSafeArea).observe(document.documentElement,{
+  subtree:true,
+  attributes:true,
+  attributeFilter:['class']
+});
+window.addEventListener('pageshow',syncLoginSafeArea);
+syncLoginSafeArea();
 })();
