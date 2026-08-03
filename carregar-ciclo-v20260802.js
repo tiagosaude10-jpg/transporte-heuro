@@ -2,13 +2,12 @@
 'use strict';
 const inject=code=>{const s=document.createElement('script');s.textContent=code;document.body.appendChild(s)};
 
-const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0323-${Date.now()}`;
+const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0327-${Date.now()}`;
 fetch(cycleUrl,{cache:'no-store'})
   .then(r=>{if(!r.ok)throw new Error('Falha ao carregar módulo da equipe');return r.text()})
   .then(inject)
   .catch(error=>{console.error(error);alert('Não foi possível atualizar o módulo Transportes da equipe. Feche e abra o aplicativo novamente.')});
 
-// Ajustes exclusivos da tela Nova solicitação de transporte.
 if(!document.getElementById('requestFormEnquadramentoCss')){
   const link=document.createElement('link');
   link.id='requestFormEnquadramentoCss';
@@ -24,7 +23,6 @@ if(!document.getElementById('requestDateTimeControlsScript')){
   document.body.appendChild(script);
 }
 
-// A agenda avançada intercepta antes do controlador antigo.
 if(!document.getElementById('agendaTransporteAvancadaScript')){
   const marker=document.createElement('meta');
   marker.id='agendaTransporteAvancadaScript';
@@ -44,7 +42,6 @@ if(!document.getElementById('agendaTransporteAvancadaScript')){
     });
 }
 
-// Histórico antigo mantido apenas como dependência de compatibilidade.
 if(!document.getElementById('historicoTransporteAvancadoScript')){
   const script=document.createElement('script');
   script.id='historicoTransporteAvancadoScript';
@@ -52,12 +49,17 @@ if(!document.getElementById('historicoTransporteAvancadoScript')){
   script.async=false;
   document.body.appendChild(script);
 }
-
-// Controlador definitivo do botão Histórico: somente concluídos, pesquisa e planilha.
 if(!document.getElementById('historicoConcluidosV2Script')){
   const script=document.createElement('script');
   script.id='historicoConcluidosV2Script';
   script.src=`historico-concluidos-v2.js?v=1-${Date.now()}`;
+  script.async=false;
+  document.body.appendChild(script);
+}
+if(!document.getElementById('historicoConcluidoPorFixScript')){
+  const script=document.createElement('script');
+  script.id='historicoConcluidoPorFixScript';
+  script.src=`historico-concluido-por-fix.js?v=1-${Date.now()}`;
   script.async=false;
   document.body.appendChild(script);
 }
