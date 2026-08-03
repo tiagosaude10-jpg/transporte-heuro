@@ -2,7 +2,7 @@
 'use strict';
 const inject=code=>{const s=document.createElement('script');s.textContent=code;document.body.appendChild(s)};
 
-const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0307-${Date.now()}`;
+const cycleUrl=`ciclo-transporte-novo.js?build=20260803-0317-${Date.now()}`;
 fetch(cycleUrl,{cache:'no-store'})
   .then(r=>{if(!r.ok)throw new Error('Falha ao carregar módulo da equipe');return r.text()})
   .then(inject)
@@ -24,8 +24,7 @@ if(!document.getElementById('requestDateTimeControlsScript')){
   document.body.appendChild(script);
 }
 
-// O arquivo antigo de ações rápidas também escuta o botão Agenda no document.
-// A agenda avançada intercepta antes para impedir a abertura da tela antiga.
+// A agenda avançada intercepta antes do controlador antigo.
 if(!document.getElementById('agendaTransporteAvancadaScript')){
   const marker=document.createElement('meta');
   marker.id='agendaTransporteAvancadaScript';
@@ -43,5 +42,14 @@ if(!document.getElementById('agendaTransporteAvancadaScript')){
       marker.remove();
       alert('Não foi possível abrir a agenda atualizada. Feche e abra o aplicativo novamente.');
     });
+}
+
+// Centro avançado do botão Histórico de transportes.
+if(!document.getElementById('historicoTransporteAvancadoScript')){
+  const script=document.createElement('script');
+  script.id='historicoTransporteAvancadoScript';
+  script.src=`historico-transporte-avancado.js?v=1-${Date.now()}`;
+  script.async=false;
+  document.body.appendChild(script);
 }
 })();
