@@ -142,3 +142,12 @@
   prepareRealBottomButton();
   new MutationObserver(prepareRealBottomButton).observe(document.documentElement, { childList: true, subtree: true });
 })();
+
+(() => {
+  if (document.getElementById('solicitadosBottomFixScript')) return;
+  const script = document.createElement('script');
+  script.id = 'solicitadosBottomFixScript';
+  script.src = `solicitados-bottom-fix.js?v=1-${Date.now()}`;
+  script.async = false;
+  document.body.appendChild(script);
+})();
