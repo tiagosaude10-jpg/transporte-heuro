@@ -19,6 +19,7 @@
       await loadScript('./cloud-app.js');
       await loadScript('./cloud-auth.js');
       await loadScript('./cloud-runtime.js');
+      await loadScript('./android-pdf-fix.js?v=1');
       console.info('Integração HEURO + Supabase carregada.');
     } catch (error) {
       console.error('Não foi possível iniciar a integração em nuvem:', error);
