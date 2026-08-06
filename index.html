@@ -122,6 +122,7 @@
   <script src="app.js?v=18"></script>
   <script src="register-flow.js?v=18"></script>
   <script src="whatsapp-routing.js?v=3"></script>
+  <script src="android-pdf-fix.js?v=1"></script>
   <script>
     (()=>{function openPicker(input){input.focus({preventScroll:true});if(typeof input.showPicker==='function'){try{input.showPicker();return}catch(_){}}input.click()}document.addEventListener('click',event=>{const clearButton=event.target.closest('[data-clear-field]');if(clearButton){event.preventDefault();const input=document.getElementById(clearButton.dataset.clearField);if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))}return}const pickerButton=event.target.closest('[data-open-picker]');if(pickerButton){event.preventDefault();const input=document.getElementById(pickerButton.dataset.openPicker);if(input)openPicker(input)}})})();
   </script>
