@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'transporte-heuro-cloud-v2';
+const CACHE_VERSION = 'transporte-heuro-cloud-v3';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const CORE_ASSETS = [
   './cloud-app.js',
   './cloud-auth.js',
   './cloud-runtime.js',
+  './android-pdf-fix.js',
   './manifest.json'
 ];
 
@@ -44,7 +45,7 @@ self.addEventListener('fetch', (event) => {
   if (event.request.mode === 'navigate') {
     event.respondWith((async () => {
       try {
-        const response = await fetch(event.request, { cache: 'no-cache' });
+        const response = await fetch(event.request, { cache: 'no-store' });
         const cache = await caches.open(CACHE_VERSION);
         cache.put('./index.html', response.clone());
         return response;
@@ -59,14 +60,15 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith((async () => {
     const cached = await caches.match(event.request);
-    const networkPromise = fetch(event.request, { cache: 'no-cache' }).then(async (response) => {
+    try {
+      const response = await fetch(event.request, { cache: 'no-store' });
       if (response && response.ok) {
         const cache = await caches.open(CACHE_VERSION);
         cache.put(event.request, response.clone());
       }
       return response;
-    });
-
-    return networkPromise.catch(() => cached || Response.error());
+    } catch (_) {
+      return cached || Response.error();
+    }
   })());
 });
