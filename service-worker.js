@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'transporte-heuro-v1';
+const CACHE_VERSION = 'transporte-heuro-cloud-v2';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -8,6 +8,10 @@ const CORE_ASSETS = [
   './app.js',
   './register-flow.js',
   './whatsapp-routing.js',
+  './supabase-config.js',
+  './cloud-app.js',
+  './cloud-auth.js',
+  './cloud-runtime.js',
   './manifest.json'
 ];
 
@@ -55,7 +59,7 @@ self.addEventListener('fetch', (event) => {
 
   event.respondWith((async () => {
     const cached = await caches.match(event.request);
-    const networkPromise = fetch(event.request).then(async (response) => {
+    const networkPromise = fetch(event.request, { cache: 'no-cache' }).then(async (response) => {
       if (response && response.ok) {
         const cache = await caches.open(CACHE_VERSION);
         cache.put(event.request, response.clone());
@@ -63,6 +67,6 @@ self.addEventListener('fetch', (event) => {
       return response;
     });
 
-    return cached || networkPromise.catch(() => Response.error());
+    return networkPromise.catch(() => cached || Response.error());
   })());
 });
