@@ -105,12 +105,16 @@ function fix(){
 }
 function start(){
   let tries=0;
+  let timer=null;
   const run=()=>{
     tries+=1;
-    if(fix()||tries>50)clearInterval(timer);
+    if(fix()||tries>50){
+      if(timer)clearInterval(timer);
+      return true;
+    }
+    return false;
   };
-  run();
-  const timer=setInterval(run,100);
+  if(!run())timer=setInterval(run,100);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 new MutationObserver(fix).observe(document.documentElement,{subtree:true,childList:true});
