@@ -1,129 +1,22 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b5fa5" />
-  <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css?v=18" />
-  <link rel="stylesheet" href="welcome-screen-fix-v16.css?v=3" />
-  <link rel="stylesheet" href="fixed-datetime.css?v=2" />
-  <title>Transporte HEURO</title>
-</head>
-<body>
-  <main id="app">
-    <section id="welcomeScreen" class="screen welcome-screen active" aria-label="Tela inicial do Transporte HEURO">
-      <div class="welcome-frame">
-        <img class="welcome-image" src="B7CD7159-F46C-4493-81F4-B566F4896F87.png?v=16" alt="HEURO Transporte — Agendamentos e Operações" />
-        <button id="welcomeEnter" class="welcome-hotspot welcome-enter" type="button" aria-label="Entrar no aplicativo"></button>
-        <button id="welcomeChangeUser" class="welcome-hotspot welcome-change-user" type="button" aria-label="Trocar usuário"></button>
-      </div>
-    </section>
-
-    <section id="loginScreen" class="screen">
-      <div class="brand-card"><div class="brand-mark">H</div><h1>Transporte HEURO</h1><p>Acesso ao sistema</p></div>
-      <form id="loginForm" class="card form-card">
-        <label for="userName">Nome de usuário</label><input id="userName" type="text" autocomplete="username" required />
-        <label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" required />
-        <label class="checkbox-row"><input id="rememberUser" type="checkbox" checked /><span>Lembrar usuário neste aparelho</span></label>
-        <button class="primary-button" type="submit">Entrar</button>
-        <button id="openRegister" class="link-button" type="button">Realizar primeiro cadastro</button>
-        <p id="loginMessage" class="form-message" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <section id="registerScreen" class="screen">
-      <div class="section-head page-head">
-        <div><span class="eyebrow dark">Primeiro acesso — Etapa 1</span><h2>Escolha o tipo de cadastro</h2><p>Selecione uma opção para continuar.</p></div>
-        <button id="registerBack" class="back-button" type="button">Voltar</button>
-      </div>
-      <div class="card form-card">
-        <fieldset class="profile-options">
-          <legend>Tipo de acesso solicitado</legend>
-          <label class="profile-option"><input type="radio" name="profileChoice" value="solicitante" /><span><strong>Solicitante de transporte</strong><small>Profissional que realiza pedidos de transporte.</small></span></label>
-          <label class="profile-option"><input type="radio" name="profileChoice" value="transporte" /><span><strong>Executante de transporte</strong><small>Profissional que recebe e executa os transportes.</small></span></label>
-          <label class="profile-option"><input type="radio" name="profileChoice" value="administrador" /><span><strong>Administrador</strong><small>Acesso administrativo sujeito à autorização de outro administrador.</small></span></label>
-        </fieldset>
-        <button id="continueRegister" class="primary-button" type="button">Continuar</button>
-        <p id="profileChoiceMessage" class="form-message" aria-live="polite"></p>
-      </div>
-    </section>
-
-    <section id="registerDetailsScreen" class="screen">
-      <div class="section-head page-head">
-        <div><span class="eyebrow dark">Primeiro acesso — Etapa 2</span><h2>Realizar cadastro</h2><p id="selectedProfileText">Preencha seus dados.</p></div>
-        <button id="registerDetailsBack" class="back-button" type="button">Voltar</button>
-      </div>
-      <form id="registerForm" class="card form-card">
-        <div hidden>
-          <label><input type="radio" name="registerProfile" value="solicitante" /></label>
-          <label><input type="radio" name="registerProfile" value="transporte" /></label>
-          <label><input type="radio" name="registerProfile" value="administrador" /></label>
-        </div>
-        <p class="admin-access-note"><strong>Perfil escolhido:</strong> <span id="selectedProfileLabel">Não selecionado</span>. O acesso somente será liberado após autorização de um administrador.</p>
-        <label for="fullName">Nome completo</label><input id="fullName" type="text" autocomplete="name" required />
-        <label for="cpf">CPF</label><input id="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
-        <label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required />
-        <label for="phone">Telefone/WhatsApp</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" required />
-        <label for="newUserName">Nome de usuário</label><input id="newUserName" type="text" autocomplete="username" minlength="3" required />
-        <label for="newPassword">Senha</label><input id="newPassword" type="password" autocomplete="new-password" minlength="6" required />
-        <label for="confirmPassword">Confirmar senha</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required />
-        <label class="checkbox-row declaration"><input id="truthDeclaration" type="checkbox" required /><span>Declaro que as informações fornecidas são verdadeiras e estou ciente de que o acesso depende da autorização de um administrador.</span></label>
-        <button class="primary-button" type="submit">Enviar cadastro para aprovação</button>
-        <p id="registerMessage" class="form-message" aria-live="polite"></p>
-      </form>
-    </section>
-
-    <section id="homeScreen" class="screen">
-      <header class="topbar"><div><span class="eyebrow">Transporte HEURO</span><h2 id="welcomeName">Olá</h2><p id="welcomeRole"></p></div><button id="logoutButton" class="text-button">Sair</button></header>
-      <div id="dashboard" class="panel-grid">
-        <button id="newRequestCard" class="feature-card highlight" data-view="request"><span class="feature-icon">＋</span><strong>Nova solicitação</strong><small>Registrar pedido de transporte</small></button>
-        <button class="feature-card" data-view="list"><span class="feature-icon">▤</span><strong>Solicitações</strong><small>Consultar e concluir pedidos</small></button>
-        <button id="usersCard" class="feature-card hidden" data-view="users"><span class="feature-icon">✓</span><strong>Autorizar usuários</strong><small>Aprovar solicitantes, executantes e administradores</small><span id="pendingBadge" class="badge hidden">0</span></button>
-        <button id="settingsCard" class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Números do WhatsApp</small></button>
-      </div>
-
-      <section id="requestView" class="card content-view hidden">
-        <div class="section-head"><div><span class="eyebrow dark">Solicitação</span><h3>Nova solicitação</h3></div><button class="back-button" data-back>Voltar</button></div>
-        <form id="requestForm" class="request-form">
-          <div class="form-grid">
-            <label>Nome do paciente<input id="patient" required /></label>
-            <div class="fixed-datetime-field">
-              <label for="birthDate">Data de nascimento</label>
-              <div class="fixed-datetime-control">
-                <input id="birthDate" type="date" aria-label="Data de nascimento" />
-                <button type="button" class="fixed-datetime-clear" data-clear-field="birthDate" aria-label="Limpar data de nascimento">×</button>
-                <button type="button" class="fixed-datetime-picker" data-open-picker="birthDate" aria-label="Abrir calendário"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 9h16"></path></svg></button>
-              </div><small>Digite a data ou selecione no calendário</small>
-            </div>
-            <label>Setor de origem<select id="originSector" required><option value="">Selecione o setor</option><option>Sala Vermelha</option><option>Clínica Médica</option><option>Clínica Cirúrgica/Ortopédica</option><option>Clínica Geral</option><option>UTI</option><option>Centro Cirúrgico</option></select></label>
-            <div id="boxLocation" class="location-group hidden"><span class="group-label">Local de origem</span><div class="location-fields single-field"><label>Box<input id="boxNumber" inputmode="numeric" placeholder="Ex.: 03" /></label></div></div>
-            <div id="wardLocation" class="location-group"><span class="group-label">Local de origem</span><div class="location-fields"><label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label><label>Leito<input id="bed" placeholder="Ex.: 08" /></label></div></div>
-            <label>Unidade de destino<input id="destination" required /></label>
-            <div class="fixed-datetime-field"><label for="transportDate">Data do transporte</label><div class="fixed-datetime-control"><input id="transportDate" type="date" required aria-label="Data do transporte" /><button type="button" class="fixed-datetime-clear" data-clear-field="transportDate" aria-label="Limpar data do transporte">×</button><button type="button" class="fixed-datetime-picker" data-open-picker="transportDate" aria-label="Abrir calendário"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 9h16"></path></svg></button></div><small>Digite a data ou selecione no calendário</small></div>
-            <div class="fixed-datetime-field"><label for="transportTime">Horário previsto</label><div class="fixed-datetime-control"><input id="transportTime" type="time" required aria-label="Horário previsto" /><button type="button" class="fixed-datetime-clear" data-clear-field="transportTime" aria-label="Limpar horário previsto">×</button><button type="button" class="fixed-datetime-picker" data-open-picker="transportTime" aria-label="Abrir relógio"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></button></div><small>Digite o horário ou selecione no relógio</small></div>
-            <label>Tipo de ambulância<select id="ambulanceType"><option>Suporte básico</option><option>UTI</option></select></label>
-            <label>Prioridade<select id="priority"><option>Programado</option><option>Urgente</option><option>Emergência</option></select></label>
-            <label>Oxigênio<select id="oxygen"><option>Não</option><option>Sim</option></select></label>
-          </div>
-          <label>Contato do setor solicitante<input id="contact" inputmode="tel" /></label>
-          <label>Observações<textarea id="notes" rows="4"></textarea></label>
-          <label>Documento da regulação<input id="attachment" type="file" accept=".pdf,image/*" /><small class="help">Nesta etapa, apenas o nome do documento fica registrado neste aparelho.</small></label>
-          <div class="action-row"><button class="primary-button" type="submit">Salvar solicitação</button></div>
-        </form>
-      </section>
-      <section id="listView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div><div id="requestList" class="request-list"></div></section>
-      <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3><p>Autorize os cadastros enviados para aprovação.</p></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
-      <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração administrativa</span><h3>Números do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>WhatsApp — Transporte básico<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" required /></label><p class="help">Informe somente números com DDD. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar números</button></form></section>
-      <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
-    </section>
-  </main>
-  <script src="app.js?v=18"></script>
-  <script src="register-flow.js?v=18"></script>
-  <script src="whatsapp-routing.js?v=3"></script>
-  <script>
-    (()=>{function openPicker(input){input.focus({preventScroll:true});if(typeof input.showPicker==='function'){try{input.showPicker();return}catch(_){}}input.click()}document.addEventListener('click',event=>{const clearButton=event.target.closest('[data-clear-field]');if(clearButton){event.preventDefault();const input=document.getElementById(clearButton.dataset.clearField);if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))}return}const pickerButton=event.target.closest('[data-open-picker]');if(pickerButton){event.preventDefault();const input=document.getElementById(pickerButton.dataset.openPicker);if(input)openPicker(input)}})})();
-  </script>
-</body>
-</html>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b5fa5"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><title>Transporte HEURO</title><link rel="manifest" href="manifest-novo.json?v=20260807-1"><link rel="apple-touch-icon" href="AC1F8155-6FA3-4763-B069-50086DF91DD6.png?v=20260807-1"><link rel="stylesheet" href="style-novo.css?v=20260807-1"><style>
+#welcomeNew.active{position:fixed!important;left:0!important;right:0!important;top:54px!important;bottom:24px!important;width:100vw!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important;z-index:9999!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#welcomeNew.active .welcome-frame{position:relative!important;width:100vw!important;height:100%!important;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important;line-height:0!important;transform:none!important}
+#welcomeNew.active .welcome-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;display:block!important;object-fit:contain!important;object-position:center center!important;transform:none!important}
+#commandNew.active{position:fixed!important;left:0!important;right:0!important;top:54px!important;bottom:24px!important;width:100vw!important;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important;z-index:9999!important;display:flex!important;align-items:center!important;justify-content:center!important;transform:none!important}
+#commandNew.active .command-frame{position:relative!important;width:100vw!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important;background:#fff!important;line-height:0!important;transform:none!important}
+#commandNew.active .command-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;display:block!important;object-fit:contain!important;object-position:center center!important;transform:none!important}
+#loginNew.active{min-height:100dvh!important;padding:calc(env(safe-area-inset-top,0px) + 18px) 14px calc(env(safe-area-inset-bottom,0px) + 24px)!important;background:linear-gradient(180deg,#eef6ff 0%,#ffffff 66%)!important;overflow-y:auto!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#loginNew .login-wrap{width:100%!important;max-width:520px!important;margin:0 auto!important}
+#loginNew .card{position:relative!important;overflow:hidden!important;border:1px solid #d7e6f6!important;border-radius:28px!important;padding:20px 18px 18px!important;background:rgba(255,255,255,.97)!important;box-shadow:0 22px 55px rgba(7,55,118,.15)!important}
+#loginNew .card:before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:linear-gradient(90deg,#0a66b7,#0d81d3,#65b52e)}
+.login-brand{display:flex;align-items:center;gap:14px;padding:8px 2px 17px;border-bottom:1px solid #e3edf7}
+.login-brand img{width:78px;height:78px;object-fit:cover;border-radius:20px;box-shadow:0 8px 22px rgba(0,55,120,.20);flex:0 0 auto}
+.login-brand-copy strong{display:block;color:#093f86;font-size:22px;line-height:1.05;letter-spacing:.01em}.login-brand-copy span{display:block;color:#63ad2d;font-size:13px;font-weight:900;letter-spacing:.08em;margin-top:6px}
+.login-intro{padding:19px 2px 12px}.login-intro small{display:block;color:#0f67ae;font-weight:900;letter-spacing:.13em;font-size:11px}.login-intro h1{margin:5px 0 5px!important;color:#14233f!important;font-size:31px!important;line-height:1.05!important}.login-intro p{margin:0!important;color:#6b7a90!important;font-size:14px!important;line-height:1.4!important}
+#loginFormNew{display:grid!important;gap:12px!important}.login-field{display:grid;gap:6px;padding:10px;border:1px solid #d8e5f3;border-radius:17px;background:#f8fbff}.login-field span{display:inline-flex;width:max-content;padding:4px 9px;border-radius:9px;background:#dfeeff;color:#0d4f91;font-size:13px;font-weight:900}.login-field input{width:100%!important;height:52px!important;min-height:52px!important;margin:0!important;padding:0 14px!important;border:1px solid #bfd2e6!important;border-radius:13px!important;background:#fff!important;color:#14233f!important;font-size:17px!important;box-sizing:border-box!important}.login-field input:focus{outline:3px solid rgba(23,128,220,.18)!important;border-color:#338bd5!important}
+#loginFormNew .primary{width:100%!important;min-height:56px!important;margin:3px 0 0!important;border:0!important;border-radius:15px!important;background:linear-gradient(135deg,#0a7bc9,#0752a8)!important;color:#fff!important;font-size:18px!important;font-weight:900!important;box-shadow:0 9px 20px rgba(8,86,169,.22)!important}
+#openRegisterNew{width:100%!important;margin:0!important;padding:12px!important;border:1px solid #cfe2f4!important;border-radius:13px!important;background:#edf6ff!important;color:#0b61aa!important;font-size:15px!important;font-weight:800!important;text-decoration:none!important}
+.login-security{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px;color:#7a8799;font-size:11px}.login-security:before{content:"✓";display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:#e7f6df;color:#4b9727;font-weight:900}
+#loginMessageNew{margin:0!important;min-height:18px!important;text-align:center!important;font-size:13px!important}
+@media(max-width:420px){#loginNew.active{padding-left:9px!important;padding-right:9px!important}#loginNew .card{padding:17px 13px 15px!important;border-radius:23px!important}.login-brand img{width:68px;height:68px}.login-brand-copy strong{font-size:19px}.login-intro h1{font-size:27px!important}}
+</style></head><body><main><section id="welcomeNew" class="screen"><div class="welcome-frame"><img class="welcome-image" src="IMG_1774.webp?v=20260807-1" alt="Tela inicial HEURO Transporte"><button id="welcomeEnterNew" class="hotspot welcome-enter" aria-label="Entrar"></button><button id="welcomeChangeNew" class="hotspot welcome-change" aria-label="Trocar usuário"></button></div></section><section id="loginNew" class="screen"><div class="login-wrap"><div class="card"><div class="login-brand"><img src="AC1F8155-6FA3-4763-B069-50086DF91DD6.png?v=20260807-1" alt="Logo Transportes HEURO"><div class="login-brand-copy"><strong>TRANSPORTES HEURO</strong><span>AGENDAMENTOS E OPERAÇÕES</span></div></div><div class="login-intro"><small>ACESSO AO SISTEMA</small><h1>Bem-vindo</h1><p>Entre com suas credenciais para acessar o transporte hospitalar.</p></div><form id="loginFormNew"><label class="login-field" for="loginUser"><span>Nome de usuário</span><input id="loginUser" autocomplete="username" placeholder="Digite seu usuário" required></label><label class="login-field" for="loginPass"><span>Senha</span><input id="loginPass" type="password" autocomplete="current-password" placeholder="Digite sua senha" required></label><button class="primary" type="submit">Entrar no sistema</button><button id="openRegisterNew" class="link" type="button">Realizar primeiro cadastro</button><div class="login-security">Acesso restrito a usuários autorizados</div><p id="loginMessageNew" class="message"></p></form></div></div></section><section id="registerNew" class="screen"><div class="register-wrap"><div class="card"><form id="registerFormNew" novalidate></form></div></div></section><section id="commandNew" class="screen"><div class="command-frame"><img class="command-image" src="05394C12-F4A3-417B-9B83-534F29C9A87D.png?v=20260807-1" alt="Página de comando HEURO Transporte"><button id="cmdBell" class="hotspot hs-bell" aria-label="Notificações"></button><button id="cmdLogout" class="hotspot hs-logout" aria-label="Sair"></button><button id="cmdNew" class="hotspot hs-new" aria-label="Solicitação de transporte"></button><button id="cmdTeam" class="hotspot hs-team" aria-label="Transportes da equipe"></button><button id="cmdPending" class="hotspot hs-pending" aria-label="Solicitações pendentes"></button><button id="cmdAgenda" class="hotspot hs-agenda" aria-label="Agenda"></button><button id="cmdHistory" class="hotspot hs-history" aria-label="Histórico"></button><button id="cmdHome" class="hotspot hs-home" aria-label="Início"></button><button id="cmdTransport" class="hotspot hs-transport" aria-label="Transportes"></button><button id="cmdNotifications" class="hotspot hs-notifications" aria-label="Notificações"></button><button id="cmdProfile" class="hotspot hs-profile" aria-label="Perfil"></button><button id="cmdMore" class="hotspot hs-more" aria-label="Mais"></button></div></section><section id="requestNew" class="screen"><div class="page-wrap"><div class="page-head"><div><span>Solicitação</span><h2>Nova solicitação de transporte</h2></div><button id="requestBackNew" class="back" type="button">Voltar</button></div><form id="requestFormNew" class="card form-grid"><label>Nome do paciente<input id="patientNew" autocapitalize="characters" autocomplete="name" required></label><label>Data de nascimento<input id="birthDateNew" type="date"></label><label>Setor de origem<select id="originSectorNew" required><option value="">Selecione</option><option>Sala Vermelha</option><option>Clínica Médica</option><option>Clínica Cirúrgica/Ortopédica</option><option>Clínica Geral</option><option>UTI</option><option>Centro Cirúrgico</option></select></label><div id="boxGroupNew" class="hidden-field"><label>Box<input id="boxNew" inputmode="numeric" placeholder="Ex.: 03"></label></div><div id="wardGroupNew" class="two-cols"><label>Enfermaria<input id="wardNew" placeholder="Ex.: Enfermaria 2"></label><label>Leito<input id="bedNew" placeholder="Ex.: 08"></label></div><label>Unidade de destino<input id="destinationNew" required></label><label>Data do transporte<input id="transportDateNew" type="date" required></label><label>Horário previsto<input id="transportTimeNew" type="time" required></label><label>Tipo de ambulância<select id="ambulanceTypeNew"><option>Suporte básico</option><option>UTI</option></select></label><label>Prioridade<select id="priorityNew"><option>Programado</option><option>Urgente</option><option>Emergência</option></select></label><label>Oxigênio<select id="oxygenNew"><option>Não</option><option>Sim</option></select></label><label>Contato do setor solicitante<input id="contactNew" inputmode="tel"></label><label class="wide">Observações<textarea id="notesNew" rows="4"></textarea></label><label class="wide">Documento da regulação<input id="attachmentNew" type="file" accept=".pdf,image/*"></label><button class="primary wide" type="submit">Salvar solicitação</button><p id="requestMessageNew" class="message wide"></p></form></div></section><section id="teamNew" class="screen"><div class="page-wrap"><div class="page-head"><div><span>Equipe de transporte</span><h2>Transportes da equipe</h2><p>Acompanhe todas as solicitações registradas neste aparelho.</p></div><button id="teamBackNew" class="back" type="button">Voltar</button></div><div id="teamListNew" class="transport-list"></div></div></section></main><script src="protocolo-heuro-novo.js?v=20260807-1"></script><script src="app-novo.js?v=20260807-1"></script><script src="acoes-rapidas-novo.js?v=20260807-1"></script><script src="topo-novo.js?v=20260807-1"></script><script src="saudacao-novo.js?v=20260807-1"></script><script src="admin-novo.js?v=20260807-1"></script><script src="pdf-modelo-heuro.js?v=20260807-1"></script><script src="envio-novo.js?v=20260807-1"></script><script src="pdf-solicitacao-modelo.js?v=20260807-1"></script><script src="carregar-ciclo-v20260802.js?v=20260807-1"></script><script src="pdf-legivel-novo.js?v=20260807-1"></script><script src="escopo-executante-novo.js?v=20260807-1"></script><script src="pdf-finalizados-novo.js?v=20260807-1"></script><script src="acoes-pendentes-v12.js?v=20260807-1"></script><script src="acoes-aceitos-novo.js?v=20260807-1"></script><script src="permissoes-perfil-novo.js?v=20260807-1"></script><script src="finalizados-planilha-v8.js?v=20260807-1"></script><script src="cargo-cadastro.js?v=20260807-1"></script><script src="equipe-layout-fix-v35.js?v=20260807-1"></script></body></html>
