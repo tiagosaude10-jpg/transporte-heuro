@@ -1,137 +1,129 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#073b86">
-  <meta name="description" content="Solicitação, execução e acompanhamento de transportes do HEURO">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="manifest" href="manifest.json?v=20260807-1">
-  <link rel="stylesheet" href="style.css?v=20260807-1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b5fa5" />
+  <meta name="description" content="Solicitação e acompanhamento de transporte do HEURO" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="welcome-screen-fix-v16.css?v=3" />
+  <link rel="stylesheet" href="fixed-datetime.css?v=2" />
   <title>Transporte HEURO</title>
 </head>
 <body>
-  <main id="app" aria-live="polite">
+  <main id="app">
     <section id="welcomeScreen" class="screen welcome-screen active" aria-label="Tela inicial do Transporte HEURO">
       <div class="welcome-frame">
-        <img class="welcome-image" src="IMG_1774.webp" alt="HEURO Transporte — Agendamentos e Operações">
+        <img class="welcome-image" src="B7CD7159-F46C-4493-81F4-B566F4896F87.png?v=16" alt="HEURO Transporte — Agendamentos e Operações" />
         <button id="welcomeEnter" class="welcome-hotspot welcome-enter" type="button" aria-label="Entrar no aplicativo"></button>
-        <button id="welcomeChangeUser" class="welcome-hotspot welcome-change" type="button" aria-label="Trocar usuário"></button>
+        <button id="welcomeChangeUser" class="welcome-hotspot welcome-change-user" type="button" aria-label="Trocar usuário"></button>
       </div>
     </section>
 
-    <section id="loginScreen" class="screen auth-screen" aria-labelledby="loginTitle">
-      <div class="auth-shell">
-        <button class="plain-back" type="button" data-go-welcome>← Voltar</button>
-        <div class="auth-brand" aria-hidden="true"><span>HEURO</span><small>TRANSPORTE</small></div>
-        <div class="auth-intro">
-          <span class="kicker">Acesso ao sistema</span>
-          <h1 id="loginTitle">Bem-vindo</h1>
-          <p>Entre com seu CPF ou e-mail e sua senha.</p>
+    <section id="loginScreen" class="screen">
+      <div class="brand-card"><div class="brand-mark">H</div><h1>Transporte HEURO</h1><p>Acesso ao sistema</p></div>
+      <form id="loginForm" class="card form-card">
+        <label for="userName">Nome de usuário</label><input id="userName" type="text" autocomplete="username" required />
+        <label for="password">Senha</label><input id="password" type="password" autocomplete="current-password" required />
+        <label class="checkbox-row"><input id="rememberUser" type="checkbox" checked /><span>Lembrar usuário neste aparelho</span></label>
+        <button class="primary-button" type="submit">Entrar</button>
+        <button id="openRegister" class="link-button" type="button">Realizar primeiro cadastro</button>
+        <p id="loginMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="registerScreen" class="screen">
+      <div class="section-head page-head">
+        <div><span class="eyebrow dark">Primeiro acesso — Etapa 1</span><h2>Escolha o tipo de cadastro</h2><p>Selecione uma opção para continuar.</p></div>
+        <button id="registerBack" class="back-button" type="button">Voltar</button>
+      </div>
+      <div class="card form-card">
+        <fieldset class="profile-options">
+          <legend>Tipo de acesso solicitado</legend>
+          <label class="profile-option"><input type="radio" name="profileChoice" value="solicitante" /><span><strong>Solicitante de transporte</strong><small>Profissional que realiza pedidos de transporte.</small></span></label>
+          <label class="profile-option"><input type="radio" name="profileChoice" value="transporte" /><span><strong>Executante de transporte</strong><small>Profissional que recebe e executa os transportes.</small></span></label>
+          <label class="profile-option"><input type="radio" name="profileChoice" value="administrador" /><span><strong>Administrador</strong><small>Acesso administrativo sujeito à autorização de outro administrador.</small></span></label>
+        </fieldset>
+        <button id="continueRegister" class="primary-button" type="button">Continuar</button>
+        <p id="profileChoiceMessage" class="form-message" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="registerDetailsScreen" class="screen">
+      <div class="section-head page-head">
+        <div><span class="eyebrow dark">Primeiro acesso — Etapa 2</span><h2>Realizar cadastro</h2><p id="selectedProfileText">Preencha seus dados.</p></div>
+        <button id="registerDetailsBack" class="back-button" type="button">Voltar</button>
+      </div>
+      <form id="registerForm" class="card form-card">
+        <div hidden>
+          <label><input type="radio" name="registerProfile" value="solicitante" /></label>
+          <label><input type="radio" name="registerProfile" value="transporte" /></label>
+          <label><input type="radio" name="registerProfile" value="administrador" /></label>
         </div>
-        <form id="loginForm" class="panel form-stack" novalidate>
-          <label for="loginIdentifier">CPF ou e-mail</label>
-          <input id="loginIdentifier" type="text" autocomplete="username" inputmode="email" placeholder="Digite seu CPF ou e-mail" required>
-          <label for="loginPassword">Senha</label>
-          <div class="password-field">
-            <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
-            <button type="button" data-toggle-password="loginPassword" aria-label="Mostrar senha">Mostrar</button>
+        <p class="admin-access-note"><strong>Perfil escolhido:</strong> <span id="selectedProfileLabel">Não selecionado</span>. O acesso somente será liberado após autorização de um administrador.</p>
+        <label for="fullName">Nome completo</label><input id="fullName" type="text" autocomplete="name" required />
+        <label for="cpf">CPF</label><input id="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required />
+        <label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required />
+        <label for="phone">Telefone/WhatsApp</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" required />
+        <label for="newUserName">Nome de usuário</label><input id="newUserName" type="text" autocomplete="username" minlength="3" required />
+        <label for="newPassword">Senha</label><input id="newPassword" type="password" autocomplete="new-password" minlength="6" required />
+        <label for="confirmPassword">Confirmar senha</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="6" required />
+        <label class="checkbox-row declaration"><input id="truthDeclaration" type="checkbox" required /><span>Declaro que as informações fornecidas são verdadeiras e estou ciente de que o acesso depende da autorização de um administrador.</span></label>
+        <button class="primary-button" type="submit">Enviar cadastro para aprovação</button>
+        <p id="registerMessage" class="form-message" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="homeScreen" class="screen">
+      <header class="topbar"><div><span class="eyebrow">Transporte HEURO</span><h2 id="welcomeName">Olá</h2><p id="welcomeRole"></p></div><button id="logoutButton" class="text-button">Sair</button></header>
+      <div id="dashboard" class="panel-grid">
+        <button id="newRequestCard" class="feature-card highlight" data-view="request"><span class="feature-icon">＋</span><strong>Nova solicitação</strong><small>Registrar pedido de transporte</small></button>
+        <button class="feature-card" data-view="list"><span class="feature-icon">▤</span><strong>Solicitações</strong><small>Consultar e concluir pedidos</small></button>
+        <button id="usersCard" class="feature-card hidden" data-view="users"><span class="feature-icon">✓</span><strong>Autorizar usuários</strong><small>Aprovar solicitantes, executantes e administradores</small><span id="pendingBadge" class="badge hidden">0</span></button>
+        <button id="settingsCard" class="feature-card" data-view="settings"><span class="feature-icon">⚙</span><strong>Configuração</strong><small>Números do WhatsApp</small></button>
+      </div>
+
+      <section id="requestView" class="card content-view hidden">
+        <div class="section-head"><div><span class="eyebrow dark">Solicitação</span><h3>Nova solicitação</h3></div><button class="back-button" data-back>Voltar</button></div>
+        <form id="requestForm" class="request-form">
+          <div class="form-grid">
+            <label>Nome do paciente<input id="patient" required /></label>
+            <div class="fixed-datetime-field">
+              <label for="birthDate">Data de nascimento</label>
+              <div class="fixed-datetime-control">
+                <input id="birthDate" type="date" aria-label="Data de nascimento" />
+                <button type="button" class="fixed-datetime-clear" data-clear-field="birthDate" aria-label="Limpar data de nascimento">×</button>
+                <button type="button" class="fixed-datetime-picker" data-open-picker="birthDate" aria-label="Abrir calendário"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 9h16"></path></svg></button>
+              </div><small>Digite a data ou selecione no calendário</small>
+            </div>
+            <label>Setor de origem<select id="originSector" required><option value="">Selecione o setor</option><option>Sala Vermelha</option><option>Clínica Médica</option><option>Clínica Cirúrgica/Ortopédica</option><option>Clínica Geral</option><option>UTI</option><option>Centro Cirúrgico</option></select></label>
+            <div id="boxLocation" class="location-group hidden"><span class="group-label">Local de origem</span><div class="location-fields single-field"><label>Box<input id="boxNumber" inputmode="numeric" placeholder="Ex.: 03" /></label></div></div>
+            <div id="wardLocation" class="location-group"><span class="group-label">Local de origem</span><div class="location-fields"><label>Enfermaria<input id="ward" placeholder="Ex.: Enfermaria 2" /></label><label>Leito<input id="bed" placeholder="Ex.: 08" /></label></div></div>
+            <label>Unidade de destino<input id="destination" required /></label>
+            <div class="fixed-datetime-field"><label for="transportDate">Data do transporte</label><div class="fixed-datetime-control"><input id="transportDate" type="date" required aria-label="Data do transporte" /><button type="button" class="fixed-datetime-clear" data-clear-field="transportDate" aria-label="Limpar data do transporte">×</button><button type="button" class="fixed-datetime-picker" data-open-picker="transportDate" aria-label="Abrir calendário"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M8 3v4M16 3v4M4 9h16"></path></svg></button></div><small>Digite a data ou selecione no calendário</small></div>
+            <div class="fixed-datetime-field"><label for="transportTime">Horário previsto</label><div class="fixed-datetime-control"><input id="transportTime" type="time" required aria-label="Horário previsto" /><button type="button" class="fixed-datetime-clear" data-clear-field="transportTime" aria-label="Limpar horário previsto">×</button><button type="button" class="fixed-datetime-picker" data-open-picker="transportTime" aria-label="Abrir relógio"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></button></div><small>Digite o horário ou selecione no relógio</small></div>
+            <label>Tipo de ambulância<select id="ambulanceType"><option>Suporte básico</option><option>UTI</option></select></label>
+            <label>Prioridade<select id="priority"><option>Programado</option><option>Urgente</option><option>Emergência</option></select></label>
+            <label>Oxigênio<select id="oxygen"><option>Não</option><option>Sim</option></select></label>
           </div>
-          <label class="check-row"><input id="rememberLogin" type="checkbox" checked><span>Lembrar meu acesso neste aparelho</span></label>
-          <button id="loginSubmit" class="button primary" type="submit">Entrar no sistema</button>
-          <button id="openRegister" class="button link" type="button">Realizar primeiro cadastro</button>
-          <p id="loginMessage" class="form-message" role="status"></p>
+          <label>Contato do setor solicitante<input id="contact" inputmode="tel" /></label>
+          <label>Observações<textarea id="notes" rows="4"></textarea></label>
+          <label>Documento da regulação<input id="attachment" type="file" accept=".pdf,image/*" /><small class="help">Nesta etapa, apenas o nome do documento fica registrado neste aparelho.</small></label>
+          <div class="action-row"><button class="primary-button" type="submit">Salvar solicitação</button></div>
         </form>
-      </div>
-    </section>
-
-    <section id="registerScreen" class="screen auth-screen" aria-labelledby="registerTitle">
-      <div class="auth-shell wide">
-        <button id="registerBack" class="plain-back" type="button">← Voltar ao acesso</button>
-        <div class="auth-intro">
-          <span class="kicker">Primeiro acesso</span>
-          <h1 id="registerTitle">Solicitar cadastro</h1>
-          <p>Preencha os dados corretamente. O acesso será liberado por um administrador.</p>
-        </div>
-        <form id="registerForm" class="panel form-grid" novalidate>
-          <label class="span-2">Nome completo<input id="regFullName" autocomplete="name" required></label>
-          <label>Nome para exibição<input id="regDisplayName" autocomplete="nickname" placeholder="Como deve aparecer no sistema"></label>
-          <label>Nome de usuário<input id="regUsername" autocomplete="username" minlength="3" maxlength="40" required></label>
-          <label>CPF<input id="regCpf" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" required></label>
-          <label>Data de nascimento<input id="regBirthDate" type="date" required></label>
-          <label>E-mail<input id="regEmail" type="email" autocomplete="email" required></label>
-          <label>Telefone/WhatsApp<input id="regPhone" type="tel" inputmode="tel" autocomplete="tel" required></label>
-          <label>Vínculo institucional
-            <select id="regLink" required>
-              <option value="">Selecione</option>
-              <option value="heuro">Profissional do HEURO</option>
-              <option value="empresa">Empresa/equipe de transporte</option>
-              <option value="administracao">Administração geral</option>
-            </select>
-          </label>
-          <label id="regSectorField" class="hidden">Setor do HEURO<input id="regSector" placeholder="Ex.: Clínica Médica"></label>
-          <label id="regCompanyField" class="hidden">Empresa de transporte<input id="regCompany" placeholder="Nome da empresa"></label>
-          <label>Cargo ou função<input id="regJobRole" placeholder="Ex.: Enfermeiro, motorista" required></label>
-          <label id="regAccessField">Acesso solicitado
-            <select id="regAccess" required>
-              <option value="solicitante">Solicitante</option>
-              <option value="executante">Executante</option>
-              <option value="solicitante_executante">Solicitante e executante</option>
-            </select>
-          </label>
-          <label>Senha<input id="regPassword" type="password" autocomplete="new-password" minlength="8" required></label>
-          <label>Confirmar senha<input id="regPasswordConfirm" type="password" autocomplete="new-password" minlength="8" required></label>
-          <label class="check-row span-2"><input id="regDeclaration" type="checkbox" required><span>Declaro que os dados informados são verdadeiros e estou ciente de que o cadastro depende de autorização.</span></label>
-          <div class="span-2"><button id="registerSubmit" class="button primary" type="submit">Enviar cadastro para aprovação</button><p id="registerMessage" class="form-message" role="status"></p></div>
-        </form>
-      </div>
-    </section>
-
-    <section id="homeScreen" class="screen app-screen" aria-labelledby="homeTitle">
-      <header class="app-header">
-        <div class="brand-lockup"><span class="brand-heuro">HEURO</span><small>TRANSPORTE</small></div>
-        <div class="header-actions">
-          <span id="connectionState" class="connection-state" title="Conexão com a central"></span>
-          <button id="refreshButton" class="icon-button" type="button" aria-label="Atualizar dados">↻</button>
-          <button id="logoutButton" class="logout-button" type="button">Sair</button>
-        </div>
-      </header>
-
-      <div id="homeHero" class="home-hero">
-        <div><span class="kicker light">Central de transportes</span><h1 id="homeTitle">Olá</h1><p id="homeRole"></p></div>
-        <div id="syncTime" class="sync-time"></div>
-      </div>
-
-      <section id="dashboard" class="dashboard" aria-label="Tela de comando">
-        <div id="summaryCards" class="summary-grid"></div>
-        <div id="commandCards" class="command-grid"></div>
       </section>
-
-      <section id="viewScreen" class="view-screen hidden">
-        <div class="view-header">
-          <button id="viewBack" class="back-button" type="button">← Voltar</button>
-          <div><span id="viewKicker" class="kicker"></span><h2 id="viewTitle"></h2><p id="viewDescription"></p></div>
-        </div>
-        <div id="viewContent"></div>
-      </section>
-
-      <nav id="bottomNav" class="bottom-nav" aria-label="Navegação principal">
-        <button type="button" data-nav="home" class="active"><span>⌂</span>Início</button>
-        <button type="button" data-nav="all"><span>▤</span>Solicitados</button>
-        <button type="button" data-nav="pending"><span>◷</span>Pendentes</button>
-        <button type="button" data-nav="history"><span>↶</span>Histórico</button>
-        <button type="button" data-nav="profile"><span>♙</span>Perfil</button>
-      </nav>
+      <section id="listView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Controle</span><h3>Solicitações</h3></div><button class="back-button" data-back>Voltar</button></div><div id="requestList" class="request-list"></div></section>
+      <section id="usersView" class="content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Administração</span><h3>Autorizar usuários</h3><p>Autorize os cadastros enviados para aprovação.</p></div><button class="back-button" data-back>Voltar</button></div><div id="userApprovalList" class="request-list"></div></section>
+      <section id="settingsView" class="card content-view hidden"><div class="section-head"><div><span class="eyebrow dark">Configuração administrativa</span><h3>Números do transporte</h3></div><button class="back-button" data-back>Voltar</button></div><form id="settingsForm" class="request-form"><label>WhatsApp — Transporte básico<input id="whatsappNumber" inputmode="numeric" placeholder="Ex.: 69999999999" required /></label><p class="help">Informe somente números com DDD. O sistema adiciona o código do Brasil automaticamente.</p><button class="primary-button" type="submit">Salvar números</button></form></section>
+      <section id="detailView" class="card content-view hidden"><div id="detailContent"></div></section>
     </section>
   </main>
-
-  <div id="toast" class="toast" role="status"></div>
-  <div id="loadingOverlay" class="loading-overlay hidden" role="status"><div class="spinner"></div><strong id="loadingText">Carregando...</strong></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.2/dist/umd/supabase.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js" crossorigin="anonymous"></script>
-  <script src="supabase-config.js?v=20260807-1"></script>
-  <script src="app.js?v=20260807-1"></script>
+  <script src="app.js?v=18"></script>
+  <script src="register-flow.js?v=18"></script>
+  <script src="whatsapp-routing.js?v=3"></script>
+  <script>
+    (()=>{function openPicker(input){input.focus({preventScroll:true});if(typeof input.showPicker==='function'){try{input.showPicker();return}catch(_){}}input.click()}document.addEventListener('click',event=>{const clearButton=event.target.closest('[data-clear-field]');if(clearButton){event.preventDefault();const input=document.getElementById(clearButton.dataset.clearField);if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))}return}const pickerButton=event.target.closest('[data-open-picker]');if(pickerButton){event.preventDefault();const input=document.getElementById(pickerButton.dataset.openPicker);if(input)openPicker(input)}})})();
+  </script>
 </body>
 </html>

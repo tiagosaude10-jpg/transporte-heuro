@@ -1,29 +1,31 @@
-(() => {
+(()=>{
   'use strict';
 
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = false;
-      script.onload = resolve;
-      script.onerror = () => reject(new Error(`Falha ao carregar ${src}`));
-      document.head.appendChild(script);
-    });
+  // Mantém o módulo de WhatsApp já existente, carregado da versão estável anterior.
+  const legacy=document.createElement('script');
+  legacy.src='https://cdn.jsdelivr.net/gh/tiagosaude10-jpg/transporte-heuro@790f2b82eac8a042c387c0912e1a36fc072c084a/whatsapp-routing.js';
+  legacy.async=false;
+  document.head.appendChild(legacy);
+
+  function openSolicitados(){
+    const pending=document.getElementById('v2Pending')||document.getElementById('cmdPending');
+    if(pending){
+      pending.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,view:window}));
+      return;
+    }
+    if(typeof window.showView==='function'){
+      window.showView('listView');
+      return;
+    }
+    const bridge=document.getElementById('v2ListBridge');
+    if(bridge) bridge.click();
   }
 
-  (async () => {
-    try {
-      await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
-      await loadScript('./supabase-config.js');
-      await loadScript('./cloud-app.js');
-      await loadScript('./cloud-auth.js');
-      await loadScript('./cloud-runtime.js');
-      await loadScript('./android-pdf-fix.js?v=1');
-      console.info('Integração HEURO + Supabase carregada.');
-    } catch (error) {
-      console.error('Não foi possível iniciar a integração em nuvem:', error);
-      alert('Não foi possível conectar o aplicativo à central em nuvem. Verifique a internet e tente novamente.');
-    }
-  })();
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('#v2Transport,#cmdTransport,#transportNavCard');
+    if(!button)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    openSolicitados();
+  },true);
 })();
