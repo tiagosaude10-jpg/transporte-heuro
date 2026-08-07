@@ -4,7 +4,25 @@ const read=()=>{try{return JSON.parse(localStorage.getItem('heuroRequests')||'[]
 const localDate=v=>{const d=new Date(v);if(Number.isNaN(d.getTime()))return'';return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 const selectedDate=()=>document.getElementById('finalizedDate')?.value||localDate(new Date());
 const finalized=date=>read().filter(x=>x.status==='Concluído'&&localDate(x.completedAt||x.transportDate)===date);
-async function makeBlob(date){const data=finalized(date);if(!data.length)throw new Error('Nenhum transporte finalizado nessa data.');if(!window.HeuroPdf?.build)throw new Error('Modelo do PDF indisponível.');let doc=null;for(let i=0;i<data.length;i++){const current=await window.HeuroPdf.build(data[i],{includeImage:false});if(!doc){doc=current}else{const pages=current.getNumberOfPages();for(let p=1;p<=pages;p++){doc.addPage();const content=current.output('datauristring');const iframe=document.createElement('iframe');iframe.style.display='none';iframe.src=content;document.body.appendChild(iframe);iframe.remove();window.HeuroPdf.drawPage(doc,data[i])}}return{blob:doc.output('blob'),name:`Transportes-finalizados-${date}.pdf`}}
+async function makeBlob(date){
+  const data=finalized(date);
+  if(!data.length)throw new Error('Nenhum transporte finalizado nessa data.');
+  if(!window.HeuroPdf?.build)throw new Error('Modelo do PDF indisponível.');
+  let doc=null;
+  for(let i=0;i<data.length;i++){
+    const current=await window.HeuroPdf.build(data[i],{includeImage:false});
+    if(!doc){
+      doc=current;
+    }else{
+      const pages=current.getNumberOfPages();
+      for(let p=1;p<=pages;p++){
+        doc.addPage();
+        window.HeuroPdf.drawPage(doc,data[i]);
+      }
+    }
+  }
+  return{blob:doc.output('blob'),name:`Transportes-finalizados-${date}.pdf`};
+}
 function download(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
 async function share(blob,name){const file=new File([blob],name,{type:'application/pdf'});if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){await navigator.share({title:'Transportes finalizados',text:'Relatório de transportes finalizados.',files:[file]});return}download(blob,name);alert('O compartilhamento direto não está disponível neste aparelho. O PDF foi baixado para você encaminhar pelo WhatsApp.')}
 function syncButtons(){const box=document.getElementById('teamListNew');const current=document.getElementById('finalizedPdfActions');const insideFinalized=!!document.getElementById('finalizedDate');if(!box||!insideFinalized){current?.remove();return}if(current)return;const actions=document.createElement('div');actions.id='finalizedPdfActions';actions.className='card';actions.style.cssText='padding:16px;margin-top:16px;display:grid;gap:12px';actions.innerHTML='<button id="shareFinalizedPdf" type="button" style="min-height:54px;border:0;border-radius:14px;background:#087f5b;color:#fff;font-size:17px;font-weight:800">Enviar PDF pelo WhatsApp</button><button id="downloadFinalizedPdf" type="button" style="min-height:54px;border:0;border-radius:14px;background:#243b64;color:#fff;font-size:17px;font-weight:800">Baixar PDF no celular</button><p style="margin:0;color:#60738a;font-size:14px">O PDF é gerado somente neste momento e não fica armazenado no sistema.</p>';box.appendChild(actions)}
